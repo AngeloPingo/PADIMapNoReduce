@@ -1,42 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.Remoting;
-using System.Runtime.Remoting.Channels;
-using System.Runtime.Remoting.Channels.Tcp;
-using System.Threading;
-using PADIMapNoReduceServices;
+using System.Windows.Forms;
 
 namespace PuppetMaster
 {
-    public class PuppetMaster
+    public partial class PuppetMaster : Form
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main(string[] args)
+        public PuppetMaster()
         {
-            TcpChannel channel = new TcpChannel(8086);
-            ChannelServices.RegisterChannel(channel, false);
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(PuppetMasterServices), "PuppetMaster",
-                WellKnownObjectMode.Singleton);
-            System.Console.WriteLine("Press <enter> to terminate chat server...");
-            System.Console.ReadLine();
-        }
-    }
-
-    class PuppetMasterServices : MarshalByRefObject, IPuppetMaster
-    {
-        List<IWorker> clients;
-
-        PuppetMasterServices()
-        {
-            clients = new List<IWorker>();
+            InitializeComponent();
         }
 
+        private void PuppetMaster_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void flowLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
