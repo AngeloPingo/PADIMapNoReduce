@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 namespace PADIMapNoReduceServices
 {
     public interface IPuppetMaster {
-        List<string> RegisterWorker(string NewWorkerPort);
-		List<string> RegisterClient(string NewClientPort);
-		void SubmitJob(File textFile);
-		void JodResult(string result);
+        void RegisterWorker(int id, string worker_url);
+		void RegisterClient(string NewClientPort);
+        string SubmitJob(string textFile);
+        string JodResult(string result);
 		//IList<KeyValuePair<string, string>> Map(string fileLine);
 	}
 
@@ -21,5 +21,16 @@ namespace PADIMapNoReduceServices
 	
 	public interface IWorker {
 		void DoJob(string fileSplited);
+        void SlowW(int secs);
+        void FreezeW();
+        void UnFreezeW();
+        void FreezeC();
+        void UnFreezeC();
+
 	}
+
+    public interface IMapper
+    {
+        IList<KeyValuePair<string, string>> Map(string fileLine);
+    }
 }
