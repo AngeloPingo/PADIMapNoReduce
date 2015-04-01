@@ -1,0 +1,3 @@
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.csprojResolveAssemblyReference.cache
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.PuppetMaster.resources
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.csproj.GenerateResource.Cache

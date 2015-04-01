@@ -1,0 +1,4 @@
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\Debug\PADIMapNoReduceServices.pdb
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.pdb
