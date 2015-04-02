@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace PADIMapNoReduceServices
         void RegisterWorker(int id, string worker_url);
 		void RegisterClient(string NewClientPort);
         string SubmitJob(string textFile);
-        string JodResult(string result);
-		//IList<KeyValuePair<string, string>> Map(string fileLine);
+        string JobResult(string result);
+        Hashtable getWorkers();
 	}
 
 	public interface IClient {
@@ -20,7 +21,7 @@ namespace PADIMapNoReduceServices
 	}
 	
 	public interface IWorker {
-		void DoJob(string fileSplited);
+        IList<KeyValuePair<string, string>> DoJob(string fileSplited);
         void SlowW(int secs);
         void FreezeW();
         void UnFreezeW();
@@ -31,6 +32,6 @@ namespace PADIMapNoReduceServices
 
     public interface IMapper
     {
-        IList<KeyValuePair<string, string>> Map(string fileLine);
+        IList<KeyValuePair<string, string>> Map(string splited_file_path);
     }
 }

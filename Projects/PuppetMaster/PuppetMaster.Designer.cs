@@ -31,6 +31,7 @@
             this.button_connect = new System.Windows.Forms.Button();
             this.label_connect = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.textBox_submit_num_splits = new System.Windows.Forms.MaskedTextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label_puppetmaster_url = new System.Windows.Forms.Label();
@@ -50,7 +51,6 @@
             this.label_id = new System.Windows.Forms.Label();
             this.textBox_submit_file = new System.Windows.Forms.TextBox();
             this.textBox_submit_output = new System.Windows.Forms.TextBox();
-            this.textBox_submit_num_splits = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -96,6 +96,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel1.Controls.Add(this.textBox_submit_num_splits, 8, 1);
             this.tableLayoutPanel1.Controls.Add(this.label4, 7, 0);
             this.tableLayoutPanel1.Controls.Add(this.label3, 5, 0);
             this.tableLayoutPanel1.Controls.Add(this.label_puppetmaster_url, 3, 0);
@@ -115,7 +116,6 @@
             this.tableLayoutPanel1.Controls.Add(this.label_id, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.textBox_submit_file, 4, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox_submit_output, 6, 1);
-            this.tableLayoutPanel1.Controls.Add(this.textBox_submit_num_splits, 8, 1);
             this.tableLayoutPanel1.Controls.Add(this.label1, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.label2, 3, 1);
             this.tableLayoutPanel1.Controls.Add(this.label5, 5, 1);
@@ -137,6 +137,16 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(1475, 297);
             this.tableLayoutPanel1.TabIndex = 2;
+            // 
+            // textBox_submit_num_splits
+            // 
+            this.textBox_submit_num_splits.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox_submit_num_splits.Location = new System.Drawing.Point(1003, 36);
+            this.textBox_submit_num_splits.Mask = "00000";
+            this.textBox_submit_num_splits.Name = "textBox_submit_num_splits";
+            this.textBox_submit_num_splits.Size = new System.Drawing.Size(194, 22);
+            this.textBox_submit_num_splits.TabIndex = 3;
+            this.textBox_submit_num_splits.ValidatingType = typeof(int);
             // 
             // label4
             // 
@@ -320,14 +330,6 @@
             this.textBox_submit_output.Size = new System.Drawing.Size(194, 22);
             this.textBox_submit_output.TabIndex = 24;
             // 
-            // textBox_submit_num_splits
-            // 
-            this.textBox_submit_num_splits.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox_submit_num_splits.Location = new System.Drawing.Point(1003, 36);
-            this.textBox_submit_num_splits.Name = "textBox_submit_num_splits";
-            this.textBox_submit_num_splits.Size = new System.Drawing.Size(194, 22);
-            this.textBox_submit_num_splits.TabIndex = 25;
-            // 
             // label1
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
@@ -443,7 +445,6 @@
         private System.Windows.Forms.Label label_id;
         private System.Windows.Forms.TextBox textBox_submit_file;
         private System.Windows.Forms.TextBox textBox_submit_output;
-        private System.Windows.Forms.TextBox textBox_submit_num_splits;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label5;
@@ -451,6 +452,7 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.TextBox textBox_submit_map;
         private System.Windows.Forms.ComboBox comboBox_submit_entery_url;
+        private System.Windows.Forms.MaskedTextBox textBox_submit_num_splits;
     }
 }
 

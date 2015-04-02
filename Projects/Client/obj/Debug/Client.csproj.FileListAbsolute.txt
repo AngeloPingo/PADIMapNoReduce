@@ -1,7 +1,7 @@
 D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\Client.exe
-D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\Client.pdb
 D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\PADIMapNoReduceServices.dll
 D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\PADIMapNoReduceServices.pdb
 D:\Code\PADIMapNoReduce\Projects\Client\obj\Debug\Client.csprojResolveAssemblyReference.cache
 D:\Code\PADIMapNoReduce\Projects\Client\obj\Debug\Client.exe
 D:\Code\PADIMapNoReduce\Projects\Client\obj\Debug\Client.pdb
+D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\Client.pdb

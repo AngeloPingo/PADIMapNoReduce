@@ -1,11 +1,11 @@
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PuppetMaster.exe.config
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PuppetMaster.exe
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PuppetMaster.pdb
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PADIMapNoReduceServices.pdb
+D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.csprojResolveAssemblyReference.cache
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.PuppetMaster.resources
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.Properties.Resources.resources
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.csproj.GenerateResource.Cache
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.exe
 D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.pdb
-D:\Code\PADIMapNoReduce\Projects\PuppetMaster\obj\Debug\PuppetMaster.csprojResolveAssemblyReference.cache
-D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PADIMapNoReduceServices.dll
-D:\Code\PADIMapNoReduce\Projects\PuppetMaster\bin\Debug\PADIMapNoReduceServices.pdb

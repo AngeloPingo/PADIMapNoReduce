@@ -35,7 +35,8 @@ namespace PuppetMaster
             textBox_worker_id.Text = Convert.ToString(++count_worker);
             String[] parametros = new String[]{textBox_worker_id.Text, textBox_worker_puppet_url.Text, textBox_worker_service_url.Text, textBox_worker_entry_url.Text};
             try {
-                System.Diagnostics.Process.Start(@"D:\Code\PADIMapNoReduce\Projects\Worker\bin\Debug\Worker.exe", String.Join(" ", parametros));
+                string path_files = Path.Combine(@"..\..\..\Worker\bin\Debug\");
+                System.Diagnostics.Process.Start(path_files + "Worker.exe", String.Join(" ", parametros));
             }
             catch (IOException msg)
             {
@@ -44,8 +45,6 @@ namespace PuppetMaster
                 throw;
             }
 
-
-
         }
 
         private void PuppetMaster_Load(object sender, EventArgs e)
@@ -53,6 +52,9 @@ namespace PuppetMaster
             textBox_worker_service_url.Text = "tcp://localhost:1111/Worker";
             textBox_worker_puppet_url.Text = "tcp://localhost:8080/PuppetMaster";
             textBox_worker_id.Text = Convert.ToString(count_worker);
+            string path_files = Path.Combine(@"..\..\..\..\files\");
+            textBox_submit_file.Text = path_files + "doc.txt";
+            textBox_submit_output.Text = path_files;
         }
 
         private void button_connect_Click(object sender, EventArgs e)
@@ -80,7 +82,8 @@ namespace PuppetMaster
             String[] parametros = new String[] { comboBox_submit_entery_url.Text, textBox_submit_file.Text, textBox_submit_output.Text, textBox_submit_num_splits.Text, textBox_submit_map.Text };
             try
             {
-                System.Diagnostics.Process.Start(@"D:\Code\PADIMapNoReduce\Projects\Client\bin\Debug\Client.exe", String.Join(" ", parametros));
+                string path_files = Path.Combine(@"..\..\..\Client\bin\Debug\");
+                System.Diagnostics.Process.Start(path_files + "Client.exe", String.Join(" ", parametros));
             }
             catch (IOException msg)
             {
@@ -123,11 +126,11 @@ namespace PuppetMaster
         public void RegisterClient(string NewClientPort) {
             System.Console.WriteLine("Service URL: ");
         }
-        public string SubmitJob(string textFile)
+        public string SubmitJob(string result)
         {
-            return "Ola ocnosucnso" + textFile;
+            return "Ola ocnosucnso" + result;
         }
-        public string JodResult(string result)
+        public string JobResult(string result)
         {
             return "Ola ccxcxzcxc" + result;
         }
