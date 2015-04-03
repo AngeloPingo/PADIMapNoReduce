@@ -29,11 +29,11 @@ namespace Client
         {
             // Alternative 2: Use the callback to get the return value
             RemoteAsyncDelegate del = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
-            foreach (KeyValuePair<string, string> pair in del.EndInvoke(ar))
-            {
-                System.Console.WriteLine(pair.Key + "  -  " + pair.Value);
-            }
-            System.Console.ReadLine();
+            //foreach (KeyValuePair<string, string> pair in del.EndInvoke(ar))
+            //{
+            //    System.Console.WriteLine(pair.Key + "  -  " + pair.Value);
+            //}
+            //System.Console.ReadLine();
             words_mapped.Add(del.EndInvoke(ar));
             Console.WriteLine("\r\n**SUCCESS**: Result of the remote AsyncCallBack: ");
 
@@ -79,7 +79,7 @@ namespace Client
             for (int i = 0; i < num_jobs; i++)
             {
                 int index = ((i + num_workers) % num_workers);
-                System.Console.WriteLine("Index: " + index);
+                //System.Console.WriteLine("Index: " + index);
                 IWorker current_worker = workers[index];
                 RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.DoJob);
                 AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);

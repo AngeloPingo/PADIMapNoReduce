@@ -21,6 +21,7 @@ namespace PuppetMaster
     {
         Hashtable workers;
         int count_worker = 0;
+        public delegate void RemoteAsyncDelegate();
         public PuppetMaster()
         {
             InitializeComponent();
@@ -100,6 +101,40 @@ namespace PuppetMaster
             comboBox_submit_entery_url.DataSource = bindingSource;
             comboBox_submit_entery_url.DisplayMember = "Value";
         }
+
+        private void comboBox_worker_freeze_Click(object sender, EventArgs e)
+        {
+            BindingSource bindingSource = new BindingSource();
+            bindingSource.DataSource = workers;
+            comboBox_worker_freeze.DataSource = bindingSource;
+            comboBox_worker_freeze.DisplayMember = "Key";
+        }
+
+        private void button_freeze_worker_Click(object sender, EventArgs e)
+        {
+            int id = Convert.ToInt32(comboBox_worker_freeze.Text);
+            string worker_url = Convert.ToString(workers[id]);
+
+            System.Console.WriteLine(id + " connectIWorker: " + worker_url);
+                IWorker newIWorker =
+                    (IWorker)Activator.GetObject(
+                           typeof(IWorker), worker_url);
+
+            System.Console.WriteLine("connectWorker!");
+
+            //Remote
+            RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIWorker.FreezeW);
+            //AsyncCallback RemoteCallback = new AsyncCallback(PuppetMaster.OurRemoteAsyncCallBack);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
+            
+            System.Console.WriteLine("Task finished!");
+
+            System.Console.ReadLine();
+
+        }
+
+
+
 
     }
 

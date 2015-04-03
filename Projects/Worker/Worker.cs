@@ -23,6 +23,14 @@ namespace Worker
         {
             init(args);
             connectPuppetMaster(args[0], args[1], args[2]);
+            //channel.StopListening(null);
+            //System.Console.WriteLine("channel.StopListening");
+            ////RemotingServices.Disconnect(this);
+            ////ChannelServices.UnregisterChannel(channel);
+            //System.Console.ReadLine();
+            //channel.StartListening(null);
+            //System.Console.WriteLine("channel.StartListening");
+            //System.Console.ReadLine();
         }
 
         private static void connectPuppetMaster(string id, string puppet_master_url, string worker_url)
@@ -51,7 +59,6 @@ namespace Worker
 
         private static void init(string[] args)
         {
-            System.Console.WriteLine("Enter: void init(string[] args)");
             int id = Convert.ToInt32(args[0]);
             String puppet_master_url = args[1];
             String service_url = args[2];
@@ -74,16 +81,19 @@ namespace Worker
             System.Console.WriteLine("Connnected in port: " + port);
             System.Console.WriteLine("Service: " + service);
             System.Console.WriteLine("Press <enter> to terminate chat server...");
+
         }
     }
 
     class WorkerServices : MarshalByRefObject, IWorker, IMapper
     {
         List<IPuppetMaster> clients;
+        Boolean freeze;
 
         WorkerServices()
         {
             clients = new List<IPuppetMaster>();
+            freeze = false;
 
         }
 
@@ -100,12 +110,23 @@ namespace Worker
 
         public void FreezeW()
         {
-            throw new NotImplementedException();
+
+            System.Console.WriteLine("FreezeW(): boolean: " + freeze);
+            freeze = true;
+            while (freeze) { 
+                Thread.Sleep(1000);
+                System.Console.WriteLine(" Thread.Sleep(1000)");
+            }
+            //throw new NotImplementedException();
+
+            
         }
 
         public void UnFreezeW()
         {
-            throw new NotImplementedException();
+            System.Console.WriteLine("UnFreezeW(): boolean: " + freeze);
+            freeze = false;
+            //throw new NotImplementedException();
         }
 
         public void FreezeC()
