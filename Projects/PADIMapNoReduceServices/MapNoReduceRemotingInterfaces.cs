@@ -14,24 +14,29 @@ namespace PADIMapNoReduceServices
         string SubmitJob(string textFile);
         string JobResult(string result);
         Hashtable getWorkers();
-	}
+	}	
 
-	public interface IClient {
+    public interface IMapper
+    {
+        IList<KeyValuePair<string, string>> Map(string splited_file_path);
+    }
+
+    public interface IMapperTransfer
+    {
+        IList<KeyValuePair<string, string>> SendMapper(byte[] code, string className, string splited_file_path);
+    }
+
+    public interface IClient
+    {
         void SendResults(string result);
-	}
-	
-	public interface IWorker {
-        IList<KeyValuePair<string, string>> DoJob(string fileSplited);
+    }
+
+    public interface IWorker : IMapperTransfer
+    {
         void SlowW(int secs);
         void FreezeW();
         void UnFreezeW();
         void FreezeC();
         void UnFreezeC();
-
-	}
-
-    public interface IMapper
-    {
-        IList<KeyValuePair<string, string>> Map(string splited_file_path);
     }
 }

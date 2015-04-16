@@ -60,6 +60,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.textBox_submit_map = new System.Windows.Forms.TextBox();
             this.comboBox_submit_entery_url = new System.Windows.Forms.ComboBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.textBox_submit_dll = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -87,9 +89,11 @@
             // 
             this.tableLayoutPanel1.AutoSize = true;
             this.tableLayoutPanel1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.tableLayoutPanel1.ColumnCount = 11;
+            this.tableLayoutPanel1.ColumnCount = 13;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 55F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 200F));
@@ -128,6 +132,8 @@
             this.tableLayoutPanel1.Controls.Add(this.label7, 9, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox_submit_map, 10, 1);
             this.tableLayoutPanel1.Controls.Add(this.comboBox_submit_entery_url, 2, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label9, 11, 1);
+            this.tableLayoutPanel1.Controls.Add(this.textBox_submit_dll, 12, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 122);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -141,7 +147,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 33F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(1475, 297);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1750, 297);
             this.tableLayoutPanel1.TabIndex = 2;
             // 
             // comboBox_worker_freeze
@@ -449,11 +455,29 @@
             this.comboBox_submit_entery_url.TabIndex = 32;
             this.comboBox_submit_entery_url.Click += new System.EventHandler(this.comboBox_submit_entery_url_click);
             // 
+            // label9
+            // 
+            this.label9.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(1513, 41);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(34, 17);
+            this.label9.TabIndex = 36;
+            this.label9.Text = "DLL";
+            // 
+            // textBox_submit_dll
+            // 
+            this.textBox_submit_dll.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox_submit_dll.Location = new System.Drawing.Point(1553, 36);
+            this.textBox_submit_dll.Name = "textBox_submit_dll";
+            this.textBox_submit_dll.Size = new System.Drawing.Size(194, 22);
+            this.textBox_submit_dll.TabIndex = 37;
+            // 
             // PuppetMaster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1663, 459);
+            this.ClientSize = new System.Drawing.Size(1772, 459);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.label_connect);
             this.Controls.Add(this.button_connect);
@@ -502,6 +526,8 @@
         private System.Windows.Forms.MaskedTextBox textBox_submit_num_splits;
         private System.Windows.Forms.ComboBox comboBox_worker_freeze;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.TextBox textBox_submit_dll;
     }
 }
 

@@ -18,7 +18,7 @@ namespace Client
     public class Client 
     {
 
-        public delegate IList<KeyValuePair<string, string>> RemoteAsyncDelegate(string path_file_splited);
+        public delegate IList<KeyValuePair<string, string>> RemoteAsyncDelegate(byte[] code, string className, string path_file_splited);
         public static Hashtable files_splited = new Hashtable();
         public static List<IList<KeyValuePair<string, string>>> words_mapped;
         public static Hashtable workers_url;
@@ -27,16 +27,16 @@ namespace Client
 	  // This is the call that the AsyncCallBack delegate will reference.
         public static void OurRemoteAsyncCallBack(IAsyncResult ar)
         {
+            
             // Alternative 2: Use the callback to get the return value
             RemoteAsyncDelegate del = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
+            System.Console.WriteLine("SUCCESS: Result of the remote AsyncCallBack - " + del.EndInvoke(ar).Count);
+            words_mapped.Add(del.EndInvoke(ar));
+            
             //foreach (KeyValuePair<string, string> pair in del.EndInvoke(ar))
             //{
             //    System.Console.WriteLine(pair.Key + "  -  " + pair.Value);
             //}
-            //System.Console.ReadLine();
-            words_mapped.Add(del.EndInvoke(ar));
-            Console.WriteLine("\r\n**SUCCESS**: Result of the remote AsyncCallBack: ");
-
             return;
         }
 
@@ -51,14 +51,20 @@ namespace Client
         [STAThread]
         static void Main(string[] args)
         {
+            String entry_url = args[0];
+            String path_file = args[1];
+            String output_path = args[2];
+            int num_splits = Convert.ToInt32(args[3]);
+            String imap_name_class = args[4];
+            String dll = args[5];
             init(args);
             files_splited = splitFile(args[1], args[3], args[2]);
             connectPuppetMaster();
-            connectIWorker(args[0]);
+            connectIWorker(dll, imap_name_class);
          
         }
 
-        private static void connectIWorker(string worker_url_lllll)
+        private static void connectIWorker(string dll, string imap_name_class)
         {
             foreach (DictionaryEntry worker in workers_url)
             {
@@ -68,23 +74,30 @@ namespace Client
                            typeof(IWorker), (string)worker.Value);
                 workers.Add(newIWorker);
             }
-            System.Console.WriteLine("connectPuppetMaster!");
+            System.Console.WriteLine("connectWorkers!");
 
             int num_jobs = files_splited.Count;
             int num_workers = workers.Count;
             System.Console.WriteLine("Num workers: " + num_workers);
             System.Console.WriteLine("num_jobs: " + num_jobs);
-            
-            
-            for (int i = 0; i < num_jobs; i++)
+
+            try
             {
-                int index = ((i + num_workers) % num_workers);
-                //System.Console.WriteLine("Index: " + index);
-                IWorker current_worker = workers[index];
-                RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.DoJob);
-                AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
-                IAsyncResult RemAr = RemoteDel.BeginInvoke(@"..\..\..\..\files\"+(i+1)+".out",
-                    RemoteCallback, null);
+                byte[] code = File.ReadAllBytes(dll);
+                for (int i = 0; i < num_jobs; i++)
+                {
+                    int index = ((i + num_workers) % num_workers);
+                    //System.Console.WriteLine("Index: " + index);
+                    IWorker current_worker = workers[index];
+                    RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
+                    AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
+                    IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, @"..\..\..\..\files\" + (i + 1) + ".out",
+                        RemoteCallback, null);
+                }
+            }
+            catch (SocketException)
+            {
+                System.Console.WriteLine("Could not locate server");
             }
             System.Console.WriteLine("Task finished!");
 
@@ -120,7 +133,7 @@ namespace Client
             String path_file = args[1];
             String output_path = args[2];
             int num_splits = Convert.ToInt32(args[3]);
-            String imap_name_class = args[4];
+            
 
             
 

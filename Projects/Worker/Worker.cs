@@ -10,6 +10,7 @@ using System.Threading;
 using PADIMapNoReduceServices;
 using System.IO;
 using System.Collections;
+using System.Reflection;
 
 namespace Worker
 {
@@ -91,21 +92,53 @@ namespace Worker
         }
     }
 
-    class WorkerServices : MarshalByRefObject, IWorker, IMapper
+    class WorkerServices : MarshalByRefObject, IWorker
     {
         List<IPuppetMaster> clients;
-        Boolean freeze;
+        Boolean freeze = false;
+        object ClassMap;
 
         WorkerServices()
         {
             clients = new List<IPuppetMaster>();
-            freeze = false;
-
         }
 
-        public IList<KeyValuePair<string, string>> DoJob(string splited_file_path) 
+        public IList<KeyValuePair<string, string>> SendMapper(byte[] code, string className, string splited_file_path)
         {
-            return Map(splited_file_path);
+            if (!freeze)
+            {
+                Assembly assembly = Assembly.Load(code);
+                // Walk through each type in the assembly looking for our class
+                foreach (Type type in assembly.GetTypes())
+                {
+                    if (type.IsClass == true)
+                    {
+                        if (type.FullName.EndsWith("." + className))
+                        {
+                            // create an instance of the object
+                            ClassMap = Activator.CreateInstance(type);
+
+                            // Dynamically Invoke the method
+                            object[] args = new object[] { splited_file_path };
+                            object resultObject = type.InvokeMember("Map",
+                              BindingFlags.Default | BindingFlags.InvokeMethod,
+                                   null,
+                                   ClassMap,
+                                   args);
+                            IList<KeyValuePair<string, string>> result = (IList<KeyValuePair<string, string>>)resultObject;
+                            //Console.WriteLine("Map call result was: ");
+                            //foreach (KeyValuePair<string, string> p in result)
+                            //{
+                            //    Console.WriteLine("key: " + p.Key + ", value: " + p.Value);
+                            //}
+                            return result;
+
+                        }
+                    }
+                }
+                throw (new System.Exception("could not invoke method"));
+            }
+            return null;
         }
 
 
@@ -116,15 +149,27 @@ namespace Worker
 
         public void FreezeW()
         {
-
-            throw new NotImplementedException();
-
-            
+            if (freeze == true) {
+                System.Console.WriteLine("Ja esta freeze!");
+            }
+            else
+            {
+                freeze = true;
+                System.Console.WriteLine("Freeze!");
+            }            
         }
 
         public void UnFreezeW()
         {
-            throw new NotImplementedException();
+            if (freeze == false)
+            {
+                System.Console.WriteLine("Ja NAO esta freeze!");
+            }
+            else
+            {
+                freeze = false;
+                System.Console.WriteLine("NOT Freeze!");
+            } 
         }
 
         public void FreezeC()
@@ -137,38 +182,5 @@ namespace Worker
             throw new NotImplementedException();
         }
 
-        public IList<KeyValuePair<string, string>> Map(string splited_file_path)
-        {
-            System.Console.WriteLine("IList: " + splited_file_path);
-            IList<KeyValuePair<string, string>> words_map = new List<KeyValuePair<string, string>>();
-            string[] reader_file = File.ReadAllLines(splited_file_path);
-            char[] delimiters = new Char [] {' ', ',', '.', ':', ';', '!', '?', '\t'};
-            int number_lines = reader_file.Length;
-            System.Console.WriteLine("number_lines: " + number_lines);
-            Hashtable hash_map_words = new Hashtable(); 
-
-            foreach (string line in reader_file)
-            {                
-                string[] words = line.Split(delimiters);
-                foreach (string word in words)
-                {
-                    if (hash_map_words.ContainsKey(word))
-                    {
-                        hash_map_words[word] = (int)hash_map_words[word] + 1;
-                    }
-                    else
-                    {
-                        hash_map_words[word] = 1;
-                    }
-                }     
-            }  
-            foreach (DictionaryEntry pair in hash_map_words)
-                {
-                    
-                    words_map.Add(new KeyValuePair<string, string>( Convert.ToString(pair.Key), Convert.ToString(pair.Value) ));
-                }
-
-            return words_map;
-        }
     }
 }

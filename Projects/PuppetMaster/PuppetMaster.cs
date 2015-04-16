@@ -22,9 +22,11 @@ namespace PuppetMaster
         Hashtable workers;
         int count_worker = 0;
         int port = 20001;
-        String puppet_master_name = "PM";
-        String worker_name = "/W";
-        String url_tcp = "tcp://localhost:";
+        string puppet_master_name = "PM";
+        string worker_name = "/W";
+        string url_tcp = "tcp://localhost:";
+        string path_dll = @"..\..\..\\LibMapper\bin\Debug\LibMapper.dll";
+        string class_mapper = "Mapper";
         public delegate void RemoteAsyncDelegate();
         public PuppetMaster()
         {
@@ -54,6 +56,8 @@ namespace PuppetMaster
 
         private void PuppetMaster_Load(object sender, EventArgs e)
         {
+            textBox_submit_dll.Text = path_dll;
+            textBox_submit_map.Text = class_mapper;
             textBox_worker_service_url.Text = url_tcp + "30001" + worker_name;
             textBox_worker_puppet_url.Text = url_tcp + port + "/" + puppet_master_name;
             textBox_worker_id.Text = Convert.ToString(count_worker);
@@ -80,9 +84,9 @@ namespace PuppetMaster
         }
 
         private void button_submit_Click(object sender, EventArgs e)
-        {
+        {       
             
-            String[] parametros = new String[] { comboBox_submit_entery_url.Text, textBox_submit_file.Text, textBox_submit_output.Text, textBox_submit_num_splits.Text, textBox_submit_map.Text };
+            String[] parametros = new String[] { comboBox_submit_entery_url.Text, textBox_submit_file.Text, textBox_submit_output.Text, textBox_submit_num_splits.Text, textBox_submit_map.Text, textBox_submit_dll.Text};
             try
             {
                 string path_files = Path.Combine(@"..\..\..\Client\bin\Debug\");
