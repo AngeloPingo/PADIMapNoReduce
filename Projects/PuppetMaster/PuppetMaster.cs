@@ -21,6 +21,10 @@ namespace PuppetMaster
     {
         Hashtable workers;
         int count_worker = 0;
+        int port = 20001;
+        String puppet_master_name = "PM";
+        String worker_name = "/W";
+        String url_tcp = "tcp://localhost:";
         public delegate void RemoteAsyncDelegate();
         public PuppetMaster()
         {
@@ -31,8 +35,8 @@ namespace PuppetMaster
         private void button_worker_Click(object sender, EventArgs e)
         {
             Random rnd = new Random();
-            int port_random = rnd.Next(1024, 65000);
-            textBox_worker_service_url.Text = "tcp://localhost:" + port_random + "/Worker";
+            int port_random = rnd.Next(30001, 39999);
+            textBox_worker_service_url.Text = url_tcp + port_random + worker_name;
             textBox_worker_id.Text = Convert.ToString(++count_worker);
             String[] parametros = new String[]{textBox_worker_id.Text, textBox_worker_puppet_url.Text, textBox_worker_service_url.Text, textBox_worker_entry_url.Text};
             try {
@@ -50,8 +54,8 @@ namespace PuppetMaster
 
         private void PuppetMaster_Load(object sender, EventArgs e)
         {
-            textBox_worker_service_url.Text = "tcp://localhost:1111/Worker";
-            textBox_worker_puppet_url.Text = "tcp://localhost:8080/PuppetMaster";
+            textBox_worker_service_url.Text = url_tcp + "30001" + worker_name;
+            textBox_worker_puppet_url.Text = url_tcp + port + "/" + puppet_master_name;
             textBox_worker_id.Text = Convert.ToString(count_worker);
             string path_files = Path.Combine(@"..\..\..\..\files\");
             textBox_submit_file.Text = path_files + "doc.txt";
@@ -60,20 +64,18 @@ namespace PuppetMaster
 
         private void button_connect_Click(object sender, EventArgs e)
         {
-            int port = 8080;
+            
             TcpChannel chan = null;
             chan = new TcpChannel(port);
             ChannelServices.RegisterChannel(chan, false);
 
             PuppetMasterServices servicos = new PuppetMasterServices();
-            RemotingServices.Marshal(servicos, "PuppetMaster",
+            RemotingServices.Marshal(servicos, puppet_master_name,
                 typeof(PuppetMasterServices));
             label_connect.Text = "Connected";
             button_connect.Enabled = false;
             workers = servicos.getWorkers();
-
-
-            
+            System.Console.WriteLine("Port PuppetMaster: " + port);
             
         }
 

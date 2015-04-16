@@ -35,18 +35,24 @@ namespace Worker
 
         private static void connectPuppetMaster(string id, string puppet_master_url, string worker_url)
         {
-            System.Console.WriteLine("Enter: void connectPuppetMaster(string id, string puppet_master_url, string worker_url)");
+            System.Console.WriteLine("Enter: void connectPuppetMaster");
             int id_worker = Convert.ToInt32(id);
             IPuppetMaster newPuppetMaster =
                 (IPuppetMaster)Activator.GetObject(
                        typeof(IPuppetMaster), puppet_master_url);
+
+            if (newPuppetMaster == null)
+            {
+                System.Console.WriteLine("newPuppetMaster == null!");
+            }
+
             System.Console.WriteLine("connectPuppetMaster!");
+            System.Console.WriteLine("id: {0}, puppet_master_url: {1}, worker_url: {2}", id, puppet_master_url, worker_url);
 
             try
             {
                 newPuppetMaster.RegisterWorker(id_worker, worker_url);
                 System.Console.WriteLine("Connect and registerd in PuppetMaster!");
-
             }
             catch (Exception e)
             {
@@ -111,22 +117,14 @@ namespace Worker
         public void FreezeW()
         {
 
-            System.Console.WriteLine("FreezeW(): boolean: " + freeze);
-            freeze = true;
-            while (freeze) { 
-                Thread.Sleep(1000);
-                System.Console.WriteLine(" Thread.Sleep(1000)");
-            }
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
 
             
         }
 
         public void UnFreezeW()
         {
-            System.Console.WriteLine("UnFreezeW(): boolean: " + freeze);
-            freeze = false;
-            //throw new NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public void FreezeC()

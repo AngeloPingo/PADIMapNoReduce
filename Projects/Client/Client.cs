@@ -94,7 +94,7 @@ namespace Client
         private static void connectPuppetMaster()
         {
             System.Console.WriteLine("Enter: void connectPuppetMaster(string id, string puppet_master_url, string worker_url)");
-            string puppet_master_url = "tcp://localhost:8080/PuppetMaster";
+            string puppet_master_url = "tcp://localhost:20001/PM";
             IPuppetMaster newPuppetMaster =
                 (IPuppetMaster)Activator.GetObject(
                        typeof(IPuppetMaster), puppet_master_url);
@@ -115,7 +115,7 @@ namespace Client
 
         private static void init(string[] args)
         {
-
+            int port = 10001;
             String entry_url = args[0];
             String path_file = args[1];
             String output_path = args[2];
@@ -129,7 +129,7 @@ namespace Client
             // int port = Convert.ToInt32(url_splited[4]);
             String service = url_splited[5];
 
-            TcpChannel channel = new TcpChannel(9090);
+            TcpChannel channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(ClientServices), "Clients",
@@ -137,7 +137,7 @@ namespace Client
 
 
             System.Console.WriteLine("Entry URL: " + entry_url);
-            System.Console.WriteLine("Connnected in port: " + 9090);
+            System.Console.WriteLine("Connnected in port: " + port);
             System.Console.WriteLine("Service: " + service);
             System.Console.WriteLine("Press <enter> to terminate chat server...");
         }
