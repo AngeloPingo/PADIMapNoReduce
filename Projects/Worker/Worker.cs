@@ -21,7 +21,10 @@ namespace Worker
         /// </summary>
         [STAThread]
         static void Main(string[] args)
-        {            
+        {
+            JobTracker jobTracker = new JobTracker();
+            Thread workerThread = new Thread(jobTracker.run);
+
             string id = args[0];
             string puppet_master_url = args[1];
             string worker_url = args[2];
@@ -94,6 +97,11 @@ namespace Worker
             System.Console.WriteLine("Press <enter> to terminate chat server...");
 
         }
+
+        public static void printHere(string msg)
+        {
+            System.Console.WriteLine("printHere: " + msg);
+        }
     }
 
     class WorkerServices : MarshalByRefObject, IWorker
@@ -109,42 +117,43 @@ namespace Worker
 
         public IList<KeyValuePair<string, string>> SendMapper(byte[] code, string className, string splited_file_path)
         {
-            if (!freeze)
-            {
+            //System.Console.WriteLine("### Enter in SendMapper(code, className, splited_file_path) ###");
+            //System.Console.WriteLine("code: " + code);
+            //System.Console.WriteLine("className: " + className);
+            //System.Console.WriteLine("splited_file_path: " + splited_file_path);
+            //if (!freeze)
+            //{
                 Assembly assembly = Assembly.Load(code);
+                
                 // Walk through each type in the assembly looking for our class
                 foreach (Type type in assembly.GetTypes())
                 {
+                    //System.Console.WriteLine("### $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ###");
                     if (type.IsClass == true)
                     {
                         if (type.FullName.EndsWith("." + className))
                         {
-                            // create an instance of the object
                             ClassMap = Activator.CreateInstance(type);
 
-                            // Dynamically Invoke the method
                             object[] args = new object[] { splited_file_path };
-                            System.Console.WriteLine("MAP!! - " + splited_file_path);
+                            //System.Console.WriteLine("MAP!! - " + splited_file_path);
                             object resultObject = type.InvokeMember("Map",
                               BindingFlags.Default | BindingFlags.InvokeMethod,
                                    null,
                                    ClassMap,
                                    args);
                             IList<KeyValuePair<string, string>> result = (IList<KeyValuePair<string, string>>)resultObject;
-                            System.Console.WriteLine("result!! - " + result.Count);
                             //Console.WriteLine("Map call result was: ");
                             //foreach (KeyValuePair<string, string> p in result)
                             //{
                             //    Console.WriteLine("key: " + p.Key + ", value: " + p.Value);
                             //}
                             return result;
-
                         }
                     }
                 }
                 throw (new System.Exception("could not invoke method"));
-            }
-            return null;
+            //}
         }
 
 
@@ -189,4 +198,67 @@ namespace Worker
         }
 
     }
+    
+}
+
+public class JobTracker
+{
+    public static Hashtable workers_url;
+    public static List<IWorker> workers = new List<IWorker>();
+
+    public void run()
+    {
+        System.Console.WriteLine("worker thread: working...");
+        Console.WriteLine("worker thread: working...");
+        
+        while (true)
+        {
+            Thread.Sleep(5*1000);
+            Console.WriteLine("thread: working... more 5 sec!");
+        }
+    }
+
+    class JobTrackerServices : IJobTracker
+    {
+
+        public void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited)
+        {
+            foreach (DictionaryEntry worker in workers_url)
+            {
+                System.Console.WriteLine((int)worker.Key + " connectIWorker: " + worker.Value);
+                IWorker newIWorker =
+                    (IWorker)Activator.GetObject(
+                           typeof(IWorker), (string)worker.Value);
+                workers.Add(newIWorker);
+            }
+            System.Console.WriteLine("connectWorkers!");
+
+            int num_jobs = files_splited.Count;
+            int num_workers = workers.Count;
+            System.Console.WriteLine("Num workers: " + num_workers);
+            System.Console.WriteLine("num_jobs: " + num_jobs);
+
+            // fazer ciclo que envia em bacth os splits a cada cliente apenas uma vez e envia de forma sincrona
+            //try
+            //{
+            //    for (int i = 0; i < num_jobs; i++)
+            //    {
+            //        int index = ((i + num_workers) % num_workers);
+            //        //System.Console.WriteLine("Index: " + index);
+            //        IWorker current_worker = workers[index];
+            //        RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
+            //        AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
+            //        System.Console.WriteLine("File send: " + files_splited[i + 1]);
+            //        IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, (String)files_splited[i + 1],
+            //            RemoteCallback, null);
+            //    }
+            //}
+            //catch (SocketException)
+            //{
+            //    System.Console.WriteLine("Could not locate server");
+            //}
+            System.Console.WriteLine("Task finished!");
+        }
+    }
+
 }

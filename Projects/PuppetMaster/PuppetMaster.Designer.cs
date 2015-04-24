@@ -75,7 +75,7 @@
             // 
             // button_connect
             // 
-            this.button_connect.Location = new System.Drawing.Point(51, 38);
+            this.button_connect.Location = new System.Drawing.Point(26, 22);
             this.button_connect.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.button_connect.Name = "button_connect";
             this.button_connect.Size = new System.Drawing.Size(75, 23);
@@ -87,7 +87,7 @@
             // label_connect
             // 
             this.label_connect.AutoSize = true;
-            this.label_connect.Location = new System.Drawing.Point(132, 43);
+            this.label_connect.Location = new System.Drawing.Point(107, 27);
             this.label_connect.Name = "label_connect";
             this.label_connect.Size = new System.Drawing.Size(102, 17);
             this.label_connect.TabIndex = 1;
@@ -484,7 +484,7 @@
             // button1
             // 
             this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(51, 84);
+            this.button1.Location = new System.Drawing.Point(26, 68);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(118, 37);
             this.button1.TabIndex = 3;
@@ -494,14 +494,14 @@
             // 
             // progressBar_script
             // 
-            this.progressBar_script.Location = new System.Drawing.Point(132, 149);
+            this.progressBar_script.Location = new System.Drawing.Point(107, 133);
             this.progressBar_script.Name = "progressBar_script";
             this.progressBar_script.Size = new System.Drawing.Size(228, 23);
             this.progressBar_script.TabIndex = 4;
             // 
             // textBox_script
             // 
-            this.textBox_script.Location = new System.Drawing.Point(51, 218);
+            this.textBox_script.Location = new System.Drawing.Point(26, 202);
             this.textBox_script.Multiline = true;
             this.textBox_script.Name = "textBox_script";
             this.textBox_script.RightToLeft = System.Windows.Forms.RightToLeft.No;
@@ -511,7 +511,7 @@
             // 
             // button_run_script_all
             // 
-            this.button_run_script_all.Location = new System.Drawing.Point(51, 149);
+            this.button_run_script_all.Location = new System.Drawing.Point(26, 133);
             this.button_run_script_all.Name = "button_run_script_all";
             this.button_run_script_all.Size = new System.Drawing.Size(75, 23);
             this.button_run_script_all.TabIndex = 6;
@@ -521,7 +521,7 @@
             // 
             // button_run_script_step
             // 
-            this.button_run_script_step.Location = new System.Drawing.Point(366, 149);
+            this.button_run_script_step.Location = new System.Drawing.Point(341, 133);
             this.button_run_script_step.Name = "button_run_script_step";
             this.button_run_script_step.Size = new System.Drawing.Size(93, 23);
             this.button_run_script_step.TabIndex = 7;
@@ -533,7 +533,7 @@
             // 
             this.label_file_script.AutoSize = true;
             this.label_file_script.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_file_script.Location = new System.Drawing.Point(175, 88);
+            this.label_file_script.Location = new System.Drawing.Point(150, 72);
             this.label_file_script.Name = "label_file_script";
             this.label_file_script.Size = new System.Drawing.Size(0, 29);
             this.label_file_script.TabIndex = 8;
@@ -542,7 +542,7 @@
             // 
             this.label_status_script.AutoSize = true;
             this.label_status_script.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_status_script.Location = new System.Drawing.Point(51, 179);
+            this.label_status_script.Location = new System.Drawing.Point(26, 163);
             this.label_status_script.Name = "label_status_script";
             this.label_status_script.Size = new System.Drawing.Size(145, 29);
             this.label_status_script.TabIndex = 9;
@@ -552,7 +552,7 @@
             // 
             this.label_run_status_display.AutoSize = true;
             this.label_run_status_display.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label_run_status_display.Location = new System.Drawing.Point(185, 179);
+            this.label_run_status_display.Location = new System.Drawing.Point(160, 163);
             this.label_run_status_display.Name = "label_run_status_display";
             this.label_run_status_display.Size = new System.Drawing.Size(0, 29);
             this.label_run_status_display.TabIndex = 10;
@@ -561,7 +561,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1772, 838);
+            this.ClientSize = new System.Drawing.Size(930, 524);
             this.Controls.Add(this.label_run_status_display);
             this.Controls.Add(this.label_status_script);
             this.Controls.Add(this.label_file_script);

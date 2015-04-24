@@ -75,18 +75,7 @@ namespace PuppetMaster
         private void button_submit_Click(object sender, EventArgs e)
         {       
             
-            String[] parametros = new String[] { comboBox_submit_entery_url.Text, textBox_submit_file.Text, textBox_submit_output.Text, textBox_submit_num_splits.Text, textBox_submit_map.Text, textBox_submit_dll.Text};
-            try
-            {
-                string path_files = Path.Combine(@"..\..\..\Client\bin\Debug\");
-                System.Diagnostics.Process.Start(path_files + "Client.exe", String.Join(" ", parametros));
-            }
-            catch (IOException msg)
-            {
-                if (msg.Source != null)
-                    Console.WriteLine("IOException source: {0}", msg.Source);
-                throw;
-            }
+            
         }
 
         private void comboBox_submit_entery_url_click(object sender, EventArgs e)
@@ -146,6 +135,8 @@ namespace PuppetMaster
                 label_file_script.Text = filename;
 
                 filelines = File.ReadAllLines(filename);
+
+                textBox_script.Text = "";
                 for (int i = 0; i < filelines.Length; i++)
                 {
                     if (i == 0) {
@@ -158,6 +149,29 @@ namespace PuppetMaster
                     
                 }
                 
+            }
+        }
+
+        private String[] readFromTextBox()
+        {
+            string[] stringSeparators = new string[] { "\r\n" };
+            return textBox_script.Text.Split(stringSeparators, StringSplitOptions.None);
+        }
+
+        private void writeToTextBox()
+        {
+            textBox_script.Text = "";
+            for (int i = 0; i < filelines.Length; i++)
+            {
+                if (i == 0)
+                {
+                    textBox_script.Text += filelines[i];
+                }
+                else
+                {
+                    textBox_script.Text += "\r\n" + filelines[i];
+                }
+
             }
         }
 
@@ -186,6 +200,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        lauchClient(args);
                     }
                     break;
                 case "WAIT":
@@ -250,6 +265,28 @@ namespace PuppetMaster
             }
         }
 
+        private void lauchClient(string[] args)
+        {
+            string entery_url = args[0];
+            string file = args[1];
+            string output = args[2];
+            string num_splits = args[3];
+            string map = args[4];
+            string dll = args[5];
+            String[] parametros = new String[] {entery_url, file, output, num_splits, map, dll};
+            try
+            {
+                string path_files = Path.Combine(@"..\..\..\Client\bin\Debug\");
+                System.Diagnostics.Process.Start(path_files + "Client.exe", String.Join(" ", parametros));
+            }
+            catch (IOException msg)
+            {
+                if (msg.Source != null)
+                    Console.WriteLine("IOException source: {0}", msg.Source);
+                throw;
+            }
+        }
+
         private void lauchWorker(string[] args)
         {
             Random rnd = new Random();
@@ -295,6 +332,7 @@ namespace PuppetMaster
 
         private void button_run_script_all_Click(object sender, EventArgs e)
         {
+            filelines = readFromTextBox();
             if (filelines != null && filelines.Length > 0)
             {
                 progressBar_script.Minimum = 0;
@@ -315,10 +353,12 @@ namespace PuppetMaster
                 label_file_script.Text = "Please select a script file";
                 progressBar_script.Value = 0;
             }
+            writeToTextBox();
         }
 
         private void button_run_script_step_Click(object sender, EventArgs e)
         {
+            filelines = readFromTextBox();
             if (filelines != null && filelines.Length > 0)
             {
                 bool isFinish = true;
@@ -333,6 +373,7 @@ namespace PuppetMaster
                         filelines[i] = "";
                         progressBar_script.Value = i + 1;
                         isFinish = false;
+                        writeToTextBox();
                         return;
                     }
                     //else
@@ -344,7 +385,6 @@ namespace PuppetMaster
                 {
                     label_run_status_display.Text = "File processed!";
                 }
-                
             }
             else
             {

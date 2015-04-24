@@ -39,4 +39,9 @@ namespace PADIMapNoReduceServices
         void FreezeC();
         void UnFreezeC();
     }
+    public interface IJobTracker
+    {
+        void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited);
+    }
+
 }

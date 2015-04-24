@@ -23,6 +23,8 @@ namespace Client
         public static List<IList<KeyValuePair<string, string>>> words_mapped;
         public static Hashtable workers_url;
         public static List<IWorker> workers = new List<IWorker>();
+        static string path_files = Path.Combine(@"..\..\..\..\files\");
+        static string path_dlls = Path.Combine(@"..\..\..\..\dlls\");
 
 	  // This is the call that the AsyncCallBack delegate will reference.
         public static void OurRemoteAsyncCallBack(IAsyncResult ar)
@@ -51,14 +53,14 @@ namespace Client
         [STAThread]
         static void Main(string[] args)
         {
-            String entry_url = args[0];
-            String path_file = args[1];
-            String output_path = args[2];
+            string entry_url = args[0];
+            string file = args[1];
+            string output_path = path_files + args[2];
             int num_splits = Convert.ToInt32(args[3]);
-            String imap_name_class = args[4];
-            String dll = args[5];
+            string imap_name_class = args[4];
+            string dll = args[5];
             init(args);
-            files_splited = splitFile(args[1], args[3], args[2]);
+            files_splited = splitFile(file, num_splits);
             connectPuppetMaster();
             connectIWorker(dll, imap_name_class);
          
@@ -66,6 +68,8 @@ namespace Client
 
         private static void connectIWorker(string dll, string imap_name_class)
         {
+            string path = Directory.GetCurrentDirectory();
+            Environment.CurrentDirectory = path_dlls;
             foreach (DictionaryEntry worker in workers_url)
             {
                 System.Console.WriteLine((int)worker.Key + " connectIWorker: " + worker.Value);
@@ -91,8 +95,10 @@ namespace Client
                     IWorker current_worker = workers[index];
                     RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
                     AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
-                    IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, @"..\..\..\..\files\" + (i + 1) + ".out",
+                    System.Console.WriteLine("File send: " + files_splited[i + 1]);
+                    IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, (String)files_splited[i + 1],
                         RemoteCallback, null);
+                    //Thread.Sleep(2 * 1000);
                 }
             }
             catch (SocketException)
@@ -101,6 +107,7 @@ namespace Client
             }
             System.Console.WriteLine("Task finished!");
 
+            Environment.CurrentDirectory = path;
             System.Console.ReadLine();
         }
 
@@ -155,28 +162,35 @@ namespace Client
             System.Console.WriteLine("Press <enter> to terminate chat server...");
         }
 
-        public static Hashtable splitFile(String path_file, String num_splits_string, String output)
+        public static Hashtable splitFile(String file, int num_splits_string)
         {
-            int num_splits = Convert.ToInt32(num_splits_string);
+            string path = Directory.GetCurrentDirectory();
+            Environment.CurrentDirectory = path_files;
             Hashtable files_splited = getHastable();
             System.Console.WriteLine("Enter: splitFile(String path_file, int num_splits)");
-            string[] reader_file = File.ReadAllLines(path_file);
+            if (!File.Exists(file))
+            {
+                System.Console.WriteLine("1-Ficheiro não existe: " + file);
+                return null;
+            }
+            string[] reader_file = File.ReadAllLines(file);
             int num_lines = reader_file.Length;
-            int num_lines_by_split = num_lines / num_splits;
+            int num_lines_by_split = num_lines / num_splits_string;
 
             System.Console.WriteLine();
             int j = 0;
-            for (int i = 1; i <= num_splits; i++)
+            for (int i = 1; i <= num_splits_string; i++)
             {
-                string path_file_temp = output + i + ".out";
+                string path_file_temp = i + ".out";
                 StreamWriter file_temp = new StreamWriter(path_file_temp);                
-                while (j < num_lines_by_split * i || (i == num_splits && j < num_lines)) {
+                while (j < num_lines_by_split * i || (i == num_splits_string && j < num_lines)) {
                     file_temp.WriteLine(reader_file[j++]);
                 }
                 file_temp.Close();
-                files_splited[i] = i + ".out";
-                System.Console.WriteLine("Write File: " + files_splited[i]);
+                files_splited[i] = path_file_temp;
+                System.Console.WriteLine("Write File: " + path_files + files_splited[i]);
             }
+            Environment.CurrentDirectory = path;
             return files_splited;
         }
 
