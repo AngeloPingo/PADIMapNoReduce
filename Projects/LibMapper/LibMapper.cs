@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LibMapper
@@ -42,6 +43,7 @@ namespace LibMapper
                 words_map.Add(new KeyValuePair<string, string>(Convert.ToString(pair.Key), Convert.ToString(pair.Value)));
             }
             System.Console.WriteLine(words_map.Count);
+            Thread.Sleep(10000);
             return words_map;
         }
     }

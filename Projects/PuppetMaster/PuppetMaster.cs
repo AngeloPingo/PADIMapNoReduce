@@ -14,6 +14,7 @@ using System.Threading;
 using PADIMapNoReduceServices;
 using System.Windows.Forms;
 using System.Collections;
+using System.Text.RegularExpressions;
 
 namespace PuppetMaster
 {
@@ -27,6 +28,8 @@ namespace PuppetMaster
         string url_tcp = "tcp://localhost:";
         string path_dll = @"..\..\..\\LibMapper\bin\Debug\LibMapper.dll";
         string class_mapper = "Mapper";
+        string[] filelines = null;
+
         public delegate void RemoteAsyncDelegate();
         public PuppetMaster()
         {
@@ -36,21 +39,7 @@ namespace PuppetMaster
 
         private void button_worker_Click(object sender, EventArgs e)
         {
-            Random rnd = new Random();
-            int port_random = rnd.Next(30001, 39999);
-            textBox_worker_service_url.Text = url_tcp + port_random + worker_name;
-            textBox_worker_id.Text = Convert.ToString(++count_worker);
-            String[] parametros = new String[]{textBox_worker_id.Text, textBox_worker_puppet_url.Text, textBox_worker_service_url.Text, textBox_worker_entry_url.Text};
-            try {
-                string path_files = Path.Combine(@"..\..\..\Worker\bin\Debug\");
-                System.Diagnostics.Process.Start(path_files + "Worker.exe", String.Join(" ", parametros));
-            }
-            catch (IOException msg)
-            {
-                if (msg.Source != null)
-                    Console.WriteLine("IOException source: {0}", msg.Source);
-                throw;
-            }
+            
 
         }
 
@@ -139,7 +128,230 @@ namespace PuppetMaster
 
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "Text Files With Script|*.txt";
+            openFileDialog1.Title = "Select a File to load a Script";
+            openFileDialog1.InitialDirectory = @"D:\Code\PADIMapNoReduce\files";
 
+            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                // this.Cursor = new Cursor(openFileDialog1.OpenFile());
+                
+                progressBar_script.Minimum = 0;
+                progressBar_script.Value = 0;
+                string filename = openFileDialog1.FileName;
+
+                label_file_script.Text = filename;
+
+                filelines = File.ReadAllLines(filename);
+                for (int i = 0; i < filelines.Length; i++)
+                {
+                    if (i == 0) {
+                        textBox_script.Text += filelines[i];
+                    }
+                    else
+                    {
+                        textBox_script.Text += "\r\n" + filelines[i];
+                    }
+                    
+                }
+                
+            }
+        }
+
+        private void readFileAndProcess(String line)
+        {
+            char[] delimiterChars = {' '};
+            String[] lineSplitted = line.Split(delimiterChars);
+            String[] args;
+            //System.Console.WriteLine("SIZE Args: " + lineSplitted.Length);
+            //System.Console.WriteLine("lineSplitted: ");
+            //printArgs(lineSplitted);
+            switch (lineSplitted[0])
+            {
+                case "WORKER":
+                    //System.Console.WriteLine("Enter command: WORKER-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 5)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                        lauchWorker(args);
+                    }
+                    break;
+                case "SUBMIT":
+                    //System.Console.WriteLine("Enter command: SUBMIT-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 7)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "WAIT":
+                    //System.Console.WriteLine("Enter command: WAIT-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 2)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "STATUS":
+                    //System.Console.WriteLine("Enter command: STATUS-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 1)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "SLOWW":
+                    //System.Console.WriteLine("Enter command: SLOWW-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 3)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "FREEZEW":
+                    //System.Console.WriteLine("Enter command: FREEZEW-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 2)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "UNFREEZEW":
+                    //System.Console.WriteLine("Enter command: UNFREEZEW-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 2)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "FREEZEC":
+                    //System.Console.WriteLine("Enter command: FREEZEC-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 2)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                case "UNFREEZEC":
+                    //System.Console.WriteLine("Enter command: UNFREEZEC-" + lineSplitted.Length);
+                    if (lineSplitted.Length == 2)
+                    {
+                        //printArgs(lineSplitted);
+                        args = removeFirst(lineSplitted);
+                    }
+                    break;
+                default:
+                    System.Console.WriteLine("Command doesn't not exist!-" + lineSplitted.Length);
+                    return;
+            }
+        }
+
+        private void lauchWorker(string[] args)
+        {
+            Random rnd = new Random();
+            int port_random = rnd.Next(30001, 39999);
+            string id = args[0];
+            string puppet_url = args[1];
+            string service_url = args[2];
+            string entry_url = args[3];
+            count_worker++;
+            //textBox_worker_service_url.Text = url_tcp + port_random + worker_name;
+            //textBox_worker_id.Text = Convert.ToString(++count_worker);
+            String[] parametros = new String[] { id, puppet_url, service_url, entry_url };
+            try
+            {
+                string path_files = Path.Combine(@"..\..\..\Worker\bin\Debug\");
+                System.Diagnostics.Process.Start(path_files + "Worker.exe", String.Join(" ", parametros));
+            }
+            catch (IOException msg)
+            {
+                if (msg.Source != null)
+                    Console.WriteLine("IOException source: {0}", msg.Source);
+                throw;
+            }            
+        }
+
+        private String[] removeFirst(String[] arrayString)
+        {
+            String[] result = new String[arrayString.Length - 1];
+            for (int i = 1; i < arrayString.Length; i++)
+                {
+                    result[i - 1] = arrayString[i];
+                }
+            return result;
+        }
+
+        private void printArgs(String[] arrayArgs)
+        {
+            for (int i = 1; i < arrayArgs.Length; i++)
+                {
+                    System.Console.WriteLine("printArgs: " + arrayArgs[i]);
+                }
+        }
+
+        private void button_run_script_all_Click(object sender, EventArgs e)
+        {
+            if (filelines != null && filelines.Length > 0)
+            {
+                progressBar_script.Minimum = 0;
+                progressBar_script.Maximum = filelines.Length - 1;
+                for (int i = 0; i < filelines.Length; i++)
+                {
+                    if (filelines[i].Length > 0)
+                    {
+                        readFileAndProcess(filelines[i]);
+                        filelines[i] = "";
+                        progressBar_script.Value = i + 1;
+                    }                    
+                }
+                label_run_status_display.Text = "File processed!";
+            }
+            else
+            {
+                label_file_script.Text = "Please select a script file";
+                progressBar_script.Value = 0;
+            }
+        }
+
+        private void button_run_script_step_Click(object sender, EventArgs e)
+        {
+            if (filelines != null && filelines.Length > 0)
+            {
+                bool isFinish = true;
+                progressBar_script.Minimum = 0;
+                progressBar_script.Maximum = filelines.Length - 1;
+                for (int i = 0; i < filelines.Length; i++)
+                {
+                    if (filelines[i].Length > 0)
+                    {
+                        readFileAndProcess(filelines[i]);
+                        label_run_status_display.Text = filelines[i];
+                        filelines[i] = "";
+                        progressBar_script.Value = i + 1;
+                        isFinish = false;
+                        return;
+                    }
+                    //else
+                    //{
+                    //    System.Console.WriteLine("Empty line!");
+                    //}
+                }
+                if (isFinish)
+                {
+                    label_run_status_display.Text = "File processed!";
+                }
+                
+            }
+            else
+            {
+                label_file_script.Text = "Please select a script file";
+                progressBar_script.Value = 0;
+            }
+        }
 
 
     }

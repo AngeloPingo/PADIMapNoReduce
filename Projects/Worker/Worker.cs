@@ -21,9 +21,13 @@ namespace Worker
         /// </summary>
         [STAThread]
         static void Main(string[] args)
-        {
+        {            
+            string id = args[0];
+            string puppet_master_url = args[1];
+            string worker_url = args[2];
+
             init(args);
-            connectPuppetMaster(args[0], args[1], args[2]);
+            connectPuppetMaster(id, puppet_master_url, worker_url);
             //channel.StopListening(null);
             //System.Console.WriteLine("channel.StopListening");
             ////RemotingServices.Disconnect(this);
@@ -120,12 +124,14 @@ namespace Worker
 
                             // Dynamically Invoke the method
                             object[] args = new object[] { splited_file_path };
+                            System.Console.WriteLine("MAP!! - " + splited_file_path);
                             object resultObject = type.InvokeMember("Map",
                               BindingFlags.Default | BindingFlags.InvokeMethod,
                                    null,
                                    ClassMap,
                                    args);
                             IList<KeyValuePair<string, string>> result = (IList<KeyValuePair<string, string>>)resultObject;
+                            System.Console.WriteLine("result!! - " + result.Count);
                             //Console.WriteLine("Map call result was: ");
                             //foreach (KeyValuePair<string, string> p in result)
                             //{

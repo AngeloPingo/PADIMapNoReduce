@@ -62,6 +62,14 @@
             this.comboBox_submit_entery_url = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
             this.textBox_submit_dll = new System.Windows.Forms.TextBox();
+            this.button1 = new System.Windows.Forms.Button();
+            this.progressBar_script = new System.Windows.Forms.ProgressBar();
+            this.textBox_script = new System.Windows.Forms.TextBox();
+            this.button_run_script_all = new System.Windows.Forms.Button();
+            this.button_run_script_step = new System.Windows.Forms.Button();
+            this.label_file_script = new System.Windows.Forms.Label();
+            this.label_status_script = new System.Windows.Forms.Label();
+            this.label_run_status_display = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -134,7 +142,7 @@
             this.tableLayoutPanel1.Controls.Add(this.comboBox_submit_entery_url, 2, 1);
             this.tableLayoutPanel1.Controls.Add(this.label9, 11, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox_submit_dll, 12, 1);
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 122);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 530);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 9;
@@ -473,11 +481,95 @@
             this.textBox_submit_dll.Size = new System.Drawing.Size(194, 22);
             this.textBox_submit_dll.TabIndex = 37;
             // 
+            // button1
+            // 
+            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button1.Location = new System.Drawing.Point(51, 84);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(118, 37);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Run File Script";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // progressBar_script
+            // 
+            this.progressBar_script.Location = new System.Drawing.Point(132, 149);
+            this.progressBar_script.Name = "progressBar_script";
+            this.progressBar_script.Size = new System.Drawing.Size(228, 23);
+            this.progressBar_script.TabIndex = 4;
+            // 
+            // textBox_script
+            // 
+            this.textBox_script.Location = new System.Drawing.Point(51, 218);
+            this.textBox_script.Multiline = true;
+            this.textBox_script.Name = "textBox_script";
+            this.textBox_script.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.textBox_script.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBox_script.Size = new System.Drawing.Size(873, 301);
+            this.textBox_script.TabIndex = 5;
+            // 
+            // button_run_script_all
+            // 
+            this.button_run_script_all.Location = new System.Drawing.Point(51, 149);
+            this.button_run_script_all.Name = "button_run_script_all";
+            this.button_run_script_all.Size = new System.Drawing.Size(75, 23);
+            this.button_run_script_all.TabIndex = 6;
+            this.button_run_script_all.Text = "Run All";
+            this.button_run_script_all.UseVisualStyleBackColor = true;
+            this.button_run_script_all.Click += new System.EventHandler(this.button_run_script_all_Click);
+            // 
+            // button_run_script_step
+            // 
+            this.button_run_script_step.Location = new System.Drawing.Point(366, 149);
+            this.button_run_script_step.Name = "button_run_script_step";
+            this.button_run_script_step.Size = new System.Drawing.Size(93, 23);
+            this.button_run_script_step.TabIndex = 7;
+            this.button_run_script_step.Text = "Run a step";
+            this.button_run_script_step.UseVisualStyleBackColor = true;
+            this.button_run_script_step.Click += new System.EventHandler(this.button_run_script_step_Click);
+            // 
+            // label_file_script
+            // 
+            this.label_file_script.AutoSize = true;
+            this.label_file_script.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_file_script.Location = new System.Drawing.Point(175, 88);
+            this.label_file_script.Name = "label_file_script";
+            this.label_file_script.Size = new System.Drawing.Size(0, 29);
+            this.label_file_script.TabIndex = 8;
+            // 
+            // label_status_script
+            // 
+            this.label_status_script.AutoSize = true;
+            this.label_status_script.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_status_script.Location = new System.Drawing.Point(51, 179);
+            this.label_status_script.Name = "label_status_script";
+            this.label_status_script.Size = new System.Drawing.Size(145, 29);
+            this.label_status_script.TabIndex = 9;
+            this.label_status_script.Text = "Run Status:";
+            // 
+            // label_run_status_display
+            // 
+            this.label_run_status_display.AutoSize = true;
+            this.label_run_status_display.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label_run_status_display.Location = new System.Drawing.Point(185, 179);
+            this.label_run_status_display.Name = "label_run_status_display";
+            this.label_run_status_display.Size = new System.Drawing.Size(0, 29);
+            this.label_run_status_display.TabIndex = 10;
+            // 
             // PuppetMaster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1772, 459);
+            this.ClientSize = new System.Drawing.Size(1772, 838);
+            this.Controls.Add(this.label_run_status_display);
+            this.Controls.Add(this.label_status_script);
+            this.Controls.Add(this.label_file_script);
+            this.Controls.Add(this.button_run_script_step);
+            this.Controls.Add(this.button_run_script_all);
+            this.Controls.Add(this.textBox_script);
+            this.Controls.Add(this.progressBar_script);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.label_connect);
             this.Controls.Add(this.button_connect);
@@ -528,6 +620,14 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.TextBox textBox_submit_dll;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.ProgressBar progressBar_script;
+        private System.Windows.Forms.TextBox textBox_script;
+        private System.Windows.Forms.Button button_run_script_all;
+        private System.Windows.Forms.Button button_run_script_step;
+        private System.Windows.Forms.Label label_file_script;
+        private System.Windows.Forms.Label label_status_script;
+        private System.Windows.Forms.Label label_run_status_display;
     }
 }
 
