@@ -21,7 +21,6 @@ namespace PuppetMaster
     public partial class PuppetMaster : Form
     {
         Hashtable workers;
-        int count_worker = 0;
         int port = 20001;
         string puppet_master_name = "PM";
         string worker_name = "/W";
@@ -45,14 +44,14 @@ namespace PuppetMaster
 
         private void PuppetMaster_Load(object sender, EventArgs e)
         {
-            textBox_submit_dll.Text = path_dll;
-            textBox_submit_map.Text = class_mapper;
-            textBox_worker_service_url.Text = url_tcp + "30001" + worker_name;
-            textBox_worker_puppet_url.Text = url_tcp + port + "/" + puppet_master_name;
-            textBox_worker_id.Text = Convert.ToString(count_worker);
-            string path_files = Path.Combine(@"..\..\..\..\files\");
-            textBox_submit_file.Text = path_files + "doc.txt";
-            textBox_submit_output.Text = path_files;
+            //textBox_submit_dll.Text = path_dll;
+            //textBox_submit_map.Text = class_mapper;
+            //textBox_worker_service_url.Text = url_tcp + "30001" + worker_name;
+            //textBox_worker_puppet_url.Text = url_tcp + port + "/" + puppet_master_name;
+            //textBox_worker_id.Text = Convert.ToString(count_worker);
+            //string path_files = Path.Combine(@"..\..\..\..\files\");
+            //textBox_submit_file.Text = path_files + "doc.txt";
+            //textBox_submit_output.Text = path_files;
         }
 
         private void button_connect_Click(object sender, EventArgs e)
@@ -191,7 +190,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
-                        lauchWorker(args);
+                        launchWorker(args);
                     }
                     break;
                 case "SUBMIT":
@@ -200,7 +199,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
-                        lauchClient(args);
+                        launchClient(args);
                     }
                     break;
                 case "WAIT":
@@ -209,6 +208,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchWait(args);
                     }
                     break;
                 case "STATUS":
@@ -217,6 +217,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        //launchStatus();
                     }
                     break;
                 case "SLOWW":
@@ -225,6 +226,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchSloww(args);
                     }
                     break;
                 case "FREEZEW":
@@ -233,6 +235,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchFreezew(args);
                     }
                     break;
                 case "UNFREEZEW":
@@ -241,6 +244,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchUnfreezew(args);
                     }
                     break;
                 case "FREEZEC":
@@ -249,6 +253,7 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchFreezec(args);
                     }
                     break;
                 case "UNFREEZEC":
@@ -257,15 +262,51 @@ namespace PuppetMaster
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
+                        launchUnfreezec(args);
                     }
                     break;
                 default:
-                    System.Console.WriteLine("Command doesn't not exist!-" + lineSplitted.Length);
+                    System.Console.WriteLine("Command doesn't not exist! -> " + lineSplitted[0]);
                     return;
             }
         }
 
-        private void lauchClient(string[] args)
+        private void launchUnfreezec(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchFreezec(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchUnfreezew(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchFreezew(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchSloww(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchStatus()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchWait(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void launchClient(string[] args)
         {
             string entery_url = args[0];
             string file = args[1];
@@ -287,7 +328,7 @@ namespace PuppetMaster
             }
         }
 
-        private void lauchWorker(string[] args)
+        private void launchWorker(string[] args)
         {
             Random rnd = new Random();
             int port_random = rnd.Next(30001, 39999);
@@ -295,10 +336,8 @@ namespace PuppetMaster
             string puppet_url = args[1];
             string service_url = args[2];
             string entry_url = args[3];
-            count_worker++;
-            //textBox_worker_service_url.Text = url_tcp + port_random + worker_name;
-            //textBox_worker_id.Text = Convert.ToString(++count_worker);
             String[] parametros = new String[] { id, puppet_url, service_url, entry_url };
+
             try
             {
                 string path_files = Path.Combine(@"..\..\..\Worker\bin\Debug\");
@@ -376,10 +415,6 @@ namespace PuppetMaster
                         writeToTextBox();
                         return;
                     }
-                    //else
-                    //{
-                    //    System.Console.WriteLine("Empty line!");
-                    //}
                 }
                 if (isFinish)
                 {

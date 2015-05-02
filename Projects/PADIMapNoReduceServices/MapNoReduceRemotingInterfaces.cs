@@ -23,7 +23,7 @@ namespace PADIMapNoReduceServices
 
     public interface IMapperTransfer
     {
-        IList<KeyValuePair<string, string>> SendMapper(byte[] code, string className, string splited_file_path);
+        bool SendMapper(byte[] code, string className, string splited_file_path);
     }
 
     public interface IClient
@@ -38,6 +38,8 @@ namespace PADIMapNoReduceServices
         void UnFreezeW();
         void FreezeC();
         void UnFreezeC();
+        void RegisterJobTracker(int id, string url_JobTracker);
+        string getJobTrackerUrl();
     }
     public interface IJobTracker
     {

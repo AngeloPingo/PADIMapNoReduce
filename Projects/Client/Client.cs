@@ -21,9 +21,12 @@ namespace Client
         public delegate IList<KeyValuePair<string, string>> RemoteAsyncDelegate(byte[] code, string className, string path_file_splited);
         public static Hashtable files_splited = new Hashtable();
         public static List<IList<KeyValuePair<string, string>>> words_mapped;
-        public static Hashtable workers_url;
-        public static List<IWorker> workers = new List<IWorker>();
-        static string path_files = Path.Combine(@"..\..\..\..\files\");
+        //public static Hashtable workers_url;
+        //public static List<IWorker> workers = new List<IWorker>();
+        private static IWorker newIWorker;
+        private static IJobTracker jobTracker;
+        //static string path_files = Path.Combine(@"..\..\..\..\files\");
+        static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
         static string path_dlls = Path.Combine(@"..\..\..\..\dlls\");
 
 	  // This is the call that the AsyncCallBack delegate will reference.
@@ -54,82 +57,106 @@ namespace Client
         static void Main(string[] args)
         {
             string entry_url = args[0];
-            string file = args[1];
+            string file = path_files + args[1];
             string output_path = path_files + args[2];
             int num_splits = Convert.ToInt32(args[3]);
             string imap_name_class = args[4];
             string dll = args[5];
             init(args);
             files_splited = splitFile(file, num_splits);
-            connectPuppetMaster();
-            connectIWorker(dll, imap_name_class);
-         
+            //connectPuppetMaster();
+            connectIWorker(dll, imap_name_class, entry_url);
+            System.Console.ReadLine();
         }
 
-        private static void connectIWorker(string dll, string imap_name_class)
+        private static void connectIWorker(string dll, string imap_name_class, string entry_url)
         {
             string path = Directory.GetCurrentDirectory();
             Environment.CurrentDirectory = path_dlls;
-            foreach (DictionaryEntry worker in workers_url)
-            {
-                System.Console.WriteLine((int)worker.Key + " connectIWorker: " + worker.Value);
-                IWorker newIWorker =
-                    (IWorker)Activator.GetObject(
-                           typeof(IWorker), (string)worker.Value);
-                workers.Add(newIWorker);
-            }
-            System.Console.WriteLine("connectWorkers!");
-
-            int num_jobs = files_splited.Count;
-            int num_workers = workers.Count;
-            System.Console.WriteLine("Num workers: " + num_workers);
-            System.Console.WriteLine("num_jobs: " + num_jobs);
-
+            string jobTracker_url;
             try
             {
                 byte[] code = File.ReadAllBytes(dll);
-                for (int i = 0; i < num_jobs; i++)
-                {
-                    int index = ((i + num_workers) % num_workers);
-                    //System.Console.WriteLine("Index: " + index);
-                    IWorker current_worker = workers[index];
-                    RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
-                    AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
-                    System.Console.WriteLine("File send: " + files_splited[i + 1]);
-                    IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, (String)files_splited[i + 1],
-                        RemoteCallback, null);
-                    //Thread.Sleep(2 * 1000);
-                }
+                Console.WriteLine("Created code");
+                newIWorker = (IWorker)Activator.GetObject(typeof(IWorker), entry_url);
+                Console.WriteLine("Created connection to newIWorker");
+                jobTracker_url = newIWorker.getJobTrackerUrl();
+                Console.WriteLine("getJobTrackerUrl() = " + jobTracker_url);
+                jobTracker = (IJobTracker)Activator.GetObject(typeof(IJobTracker), jobTracker_url);
+                Console.WriteLine("Created connection to jobTracker");
+                jobTracker.spreadJobs(code, imap_name_class, (Hashtable)files_splited);
+                Console.WriteLine("spreadJobs(code, {0}, Jobs={1})", imap_name_class, files_splited.Count);
             }
-            catch (SocketException)
+            catch (Exception e)
             {
-                System.Console.WriteLine("Could not locate server");
+                Console.WriteLine("Client-Exception Message: {0}", e.Message);
+                Console.WriteLine("Client-Exception Message: {0}", e.Source);
+                Console.WriteLine("Client-Exception Trace: {0}", e.ToString());
             }
-            System.Console.WriteLine("Task finished!");
-
             Environment.CurrentDirectory = path;
-            System.Console.ReadLine();
+
+            //string path = Directory.GetCurrentDirectory();
+            //Environment.CurrentDirectory = path_dlls;
+            //foreach (DictionaryEntry worker in workers_url)
+            //{
+            //    System.Console.WriteLine((int)worker.Key + " connectIWorker: " + worker.Value);
+            //    IWorker newIWorker =
+            //        (IWorker)Activator.GetObject(
+            //               typeof(IWorker), (string)worker.Value);
+            //    workers.Add(newIWorker);
+            //}
+            //System.Console.WriteLine("connectWorkers!");
+
+            //int num_jobs = files_splited.Count;
+            //int num_workers = workers.Count;
+            //System.Console.WriteLine("Num workers: " + num_workers);
+            //System.Console.WriteLine("num_jobs: " + num_jobs);
+
+            //try
+            //{
+            //    byte[] code = File.ReadAllBytes(dll);
+            //    for (int i = 0; i < num_jobs; i++)
+            //    {
+            //        int index = ((i + num_workers) % num_workers);
+            //        //System.Console.WriteLine("Index: " + index);
+            //        IWorker current_worker = workers[index];
+            //        RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
+            //        AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
+            //        System.Console.WriteLine("File send: " + files_splited[i + 1]);
+            //        IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, (String)files_splited[i + 1],
+            //            RemoteCallback, null);
+            //        //Thread.Sleep(2 * 1000);
+            //    }
+            //}
+            //catch (SocketException)
+            //{
+            //    System.Console.WriteLine("Could not locate server");
+            //}
+            //System.Console.WriteLine("Task finished!");
+
+            //Environment.CurrentDirectory = path;
+            //System.Console.ReadLine();
         }
 
         private static void connectPuppetMaster()
         {
-            System.Console.WriteLine("Enter: void connectPuppetMaster(string id, string puppet_master_url, string worker_url)");
-            string puppet_master_url = "tcp://localhost:20001/PM";
-            IPuppetMaster newPuppetMaster =
-                (IPuppetMaster)Activator.GetObject(
-                       typeof(IPuppetMaster), puppet_master_url);
-            System.Console.WriteLine("connectPuppetMaster!");
+            //System.Console.WriteLine("Enter: void connectPuppetMaster(string id, string puppet_master_url, string worker_url)");
+            //string puppet_master_url = "tcp://localhost:20001/PM";
+            //IPuppetMaster newPuppetMaster =
+            //    (IPuppetMaster)Activator.GetObject(
+            //           typeof(IPuppetMaster), puppet_master_url);
+            //System.Console.WriteLine("connectPuppetMaster!");
 
-            try
-            {
-                workers_url = newPuppetMaster.getWorkers();
-                System.Console.WriteLine("List workers recived!");
+            //try
+            //{
+            //    workers_url = newPuppetMaster.getWorkers();
+            //    System.Console.WriteLine("List workers recived!");
 
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Fail! " + e.Message);
-            }
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine("Fail! " + e.Message);
+            //}
 
         }
 
@@ -164,10 +191,10 @@ namespace Client
 
         public static Hashtable splitFile(String file, int num_splits_string)
         {
-            string path = Directory.GetCurrentDirectory();
-            Environment.CurrentDirectory = path_files;
+            //string path = Directory.GetCurrentDirectory();
+            //Environment.CurrentDirectory = path_files;
             Hashtable files_splited = getHastable();
-            System.Console.WriteLine("Enter: splitFile(String path_file, int num_splits)");
+            System.Console.WriteLine("Enter: splitFile({0}, {1})", file, num_splits_string);
             if (!File.Exists(file))
             {
                 System.Console.WriteLine("1-Ficheiro não existe: " + file);
@@ -181,16 +208,16 @@ namespace Client
             int j = 0;
             for (int i = 1; i <= num_splits_string; i++)
             {
-                string path_file_temp = i + ".out";
+                string path_file_temp = path_files + i + ".out";
                 StreamWriter file_temp = new StreamWriter(path_file_temp);                
                 while (j < num_lines_by_split * i || (i == num_splits_string && j < num_lines)) {
                     file_temp.WriteLine(reader_file[j++]);
                 }
                 file_temp.Close();
                 files_splited[i] = path_file_temp;
-                System.Console.WriteLine("Write File: " + path_files + files_splited[i]);
+                System.Console.WriteLine("Write File: " + files_splited[i]);
             }
-            Environment.CurrentDirectory = path;
+            //Environment.CurrentDirectory = path;
             return files_splited;
         }
 

@@ -14,11 +14,13 @@ namespace LibMapper
     {
         public IList<KeyValuePair<string, string>> Map(string splited_file_path)
         {
-            Environment.CurrentDirectory = @"..\..\..\..\files\";
+            //string path = Directory.GetCurrentDirectory();
+            //Environment.CurrentDirectory = @"..\..\..\..\files\";
+            IList<KeyValuePair<string, string>> words_map = new List<KeyValuePair<string, string>>();
             try
             {
+                Console.WriteLine("Entrou no MAP: " + splited_file_path);
                 //Thread.Sleep(2*1000);
-                IList<KeyValuePair<string, string>> words_map = new List<KeyValuePair<string, string>>();
                 string[] reader_file;
                 char[] delimiters = new Char[] { ' ', ',', '.', ':', ';', '!', '?', '\t' };
                 if (File.Exists(splited_file_path))
@@ -51,18 +53,19 @@ namespace LibMapper
                 }
                 foreach (DictionaryEntry pair in hash_map_words)
                 {
-
                     words_map.Add(new KeyValuePair<string, string>(Convert.ToString(pair.Key), Convert.ToString(pair.Value)));
                 }
                 System.Console.WriteLine(splited_file_path + " - Finish mapping: " + words_map.Count);
-                return words_map;
+
             }
-            catch (IOException e)
+            catch (Exception e)
             {
-                if (e.Source != null)
-                    Console.WriteLine("IOException source: {0}", e.Source);
-                throw;
+                Console.WriteLine("LibMapper-Exception Message: {0}", e.Message);
+                Console.WriteLine("LibMapper-Exception Trace: {0}", e.ToString());
+                return null;
             }
+            //Environment.CurrentDirectory = path;
+            return words_map;
         }
     }
 }
