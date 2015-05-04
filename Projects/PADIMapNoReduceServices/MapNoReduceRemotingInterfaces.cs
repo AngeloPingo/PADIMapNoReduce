@@ -43,6 +43,7 @@ namespace PADIMapNoReduceServices
     }
     public interface IJobTracker
     {
+        bool registerNewWorker(int worker_id, string worker_url);
         void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited);
     }
 

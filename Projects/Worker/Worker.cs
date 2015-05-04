@@ -16,9 +16,10 @@ namespace Worker
 {
     public class Worker
     {
-        public static string worker_url;
+        public static int my_id;
+        public static string my_url;
         public static string puppet_master_url;
-        public static string id;
+        public static string job_tracker_url;
         public static int port;
         public static TcpChannel chan;
 
@@ -29,9 +30,9 @@ namespace Worker
         static void Main(string[] args)
         {
             bool hasEntryUrl = false;
-            id = args[0];
+            my_id = Convert.ToInt32(args[0]);
             puppet_master_url = args[1];
-            worker_url = args[2];
+            my_url = args[2];
             string entry_url = null;
 
             if (args.Length > 3)
@@ -62,7 +63,7 @@ namespace Worker
             System.Console.ReadLine();
         }
 
-        private static void connectEntryUrl(string entry_url)
+        private static bool connectEntryUrl(string entry_url)
         {
             System.Console.WriteLine("Enter: connectEntryUrl: {0}", entry_url);
 
@@ -77,8 +78,15 @@ namespace Worker
 
             try
             {
-                newWorker.GetJobTracker();
-                System.Console.WriteLine("Connect and registerd in worker - " + worker_url);
+                job_tracker_url = newWorker.getJobTrackerUrl();
+
+                IJobTracker newJobTracker =
+                (IJobTracker)Activator.GetObject(
+                       typeof(IJobTracker), job_tracker_url);
+
+                newJobTracker.registerNewWorker(my_id, my_url);
+
+                System.Console.WriteLine("Connect and registerd in worker - " + my_url);
                 return true;
             }
             catch (Exception e)
@@ -340,8 +348,8 @@ namespace Worker
 
         private static bool connectWorker()
         {
-            int id_worker = Convert.ToInt32(Worker.id);
-            string worker_url = Worker.worker_url;
+            int id_worker = Worker.my_id;
+            string worker_url = Worker.my_url;
             System.Console.WriteLine("Enter: connectWorker: {0} - {1}", id_worker, worker_url);
 
             IWorker newWorker =
@@ -355,7 +363,7 @@ namespace Worker
             else
             {
                 workers.Add(id_worker, newWorker);
-                workers_url.Add(id_worker, newWorker);
+                workers_url.Add(id_worker, worker_url);
             }
 
             try
@@ -445,6 +453,33 @@ namespace Worker
                     //break; // tirar break assim so faz o primeiro split
                 }
                 return isSucess;
+            }
+
+            public bool registerNewWorker(int worker_id, string worker_url)
+            {
+                System.Console.WriteLine("Enter: registerNewWorker: {0}", worker_url);
+
+                IWorker newWorker =
+                    (IWorker)Activator.GetObject(
+                           typeof(IWorker), worker_url);
+
+                if (newWorker == null)
+                {
+                    System.Console.WriteLine("newWorker == null!");
+                }
+
+                try
+                {
+                    workers.Add(worker_id, newWorker);
+                    workers_url.Add(worker_id, worker_url);
+                    System.Console.WriteLine("Connect and registerd in worker ID {0} - {1}",worker_id, worker_url);
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Fail! " + e.ToString());
+                    return false;
+                }
             }
         }
     }
