@@ -303,7 +303,9 @@ namespace PuppetMaster
 
         private void launchWait(string[] args)
         {
-            throw new NotImplementedException();
+            int segundos = Convert.ToInt32(args[0]);
+            label_run_status_display.Text = "PuppetMaster STOPS " + segundos + " sec´s --";
+            System.Threading.Thread.Sleep(segundos * 1000);
         }
 
         private void launchClient(string[] args)
