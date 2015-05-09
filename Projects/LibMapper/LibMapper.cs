@@ -12,27 +12,27 @@ namespace LibMapper
 {
     public class Mapper : IMapper
     {
-        public IList<KeyValuePair<string, string>> Map(string splited_file_path)
+        public IList<KeyValuePair<string, string>> Map(string fileLine)
         {
             //string path = Directory.GetCurrentDirectory();
             //Environment.CurrentDirectory = @"..\..\..\..\files\";
             IList<KeyValuePair<string, string>> words_map = new List<KeyValuePair<string, string>>();
             try
             {
-                Console.WriteLine("Entrou no MAP: " + splited_file_path);
+                Console.WriteLine("Entrou no MAP: " + fileLine);
                 //Thread.Sleep(2*1000);
                 string[] reader_file;
                 char[] delimiters = new Char[] { ' ', ',', '.', ':', ';', '!', '?', '\t' };
-                if (File.Exists(splited_file_path))
+                if (File.Exists(fileLine))
                 {
-                    reader_file = File.ReadAllLines(splited_file_path);
+                    reader_file = File.ReadAllLines(fileLine);
                 }
                 else {
-                    System.Console.WriteLine("2-Ficheiro não existe: " + splited_file_path);
+                    System.Console.WriteLine("2-Ficheiro não existe: " + fileLine);
                     return null;
                 }
 
-                reader_file = File.ReadAllLines(splited_file_path);
+                reader_file = File.ReadAllLines(fileLine);
                 int number_lines = reader_file.Length;
                 Hashtable hash_map_words = new Hashtable();
 
@@ -55,7 +55,7 @@ namespace LibMapper
                 {
                     words_map.Add(new KeyValuePair<string, string>(Convert.ToString(pair.Key), Convert.ToString(pair.Value)));
                 }
-                System.Console.WriteLine(splited_file_path + " - Finish mapping: " + words_map.Count);
+                System.Console.WriteLine(fileLine + " - Finish mapping: " + words_map.Count);
 
             }
             catch (Exception e)

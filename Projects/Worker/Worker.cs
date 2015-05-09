@@ -226,10 +226,19 @@ namespace Worker
                     }
                 }
                             }
+            catch (ReflectionTypeLoadException ex)
+            {
+                foreach (var item in ex.LoaderExceptions)
+                {
+                    Console.WriteLine("Worker-LoaderExceptions Message: {0}", item.Message.ToString());
+                }
+            }
             catch (Exception e)
             {
                 Console.WriteLine("Worker-Exception Message: {0}", e.Message);
+                Console.WriteLine("");
                 Console.WriteLine("Worker-Exception Message: {0}", e.Source);
+                Console.WriteLine("");
                 Console.WriteLine("Worker-Exception Trace: {0}", e.ToString());
             }
                 throw (new System.Exception("could not invoke method"));
@@ -419,13 +428,9 @@ namespace Worker
 
                 foreach (DictionaryEntry pair in JobDistribution)
                 {
-                    //Thread t5 = new Thread(sendJobToWorker((int)pair.Key, code, imap_name_class, (List<string>)pair.Value));
-                    //t5.Start();
                     Console.WriteLine("Job send to {0}, with {1} splits!", (int)pair.Key, ((List<string>)pair.Value).Count);
-                    if (sendJobToWorker((int)pair.Key, code, imap_name_class, (List<string>)pair.Value))
-                    {
-                        Console.WriteLine("Job {0} finish with success!", (int)pair.Key);
-                    }
+                    Thread thread = new Thread(() => sendJobToWorker((int)pair.Key, code, imap_name_class, (List<string>)pair.Value));
+                    thread.Start();
                 }
                 
                 System.Console.WriteLine("Task finished!");

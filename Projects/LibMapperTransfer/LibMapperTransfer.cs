@@ -8,6 +8,6 @@ namespace MapperTransfer
 {
     public interface IMapperTransfer
     {
-        IList<KeyValuePair<string, string>> SendMapper(byte[] code, string className, string splited_file_path);
+        bool SendMapper(byte[] code, string className, string splited_file_path);
     }
 }

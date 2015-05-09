@@ -18,7 +18,7 @@ namespace PADIMapNoReduceServices
 
     public interface IMapper
     {
-        IList<KeyValuePair<string, string>> Map(string splited_file_path);
+        IList<KeyValuePair<string, string>> Map(string fileLine);
     }
 
     public interface IMapperTransfer
