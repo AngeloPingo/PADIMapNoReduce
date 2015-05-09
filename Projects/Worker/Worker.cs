@@ -19,7 +19,8 @@ namespace Worker
         public static int my_id;
         public static string my_url;
         public static string puppet_master_url;
-        public static string job_tracker_url;
+        public static string my_job_tracker_url;
+        public static Hashtable job_trackers_url = new Hashtable();
         public static int port;
         public static TcpChannel chan;
 
@@ -29,18 +30,12 @@ namespace Worker
         [STAThread]
         static void Main(string[] args)
         {
+
             bool hasEntryUrl = false;
             my_id = Convert.ToInt32(args[0]);
             puppet_master_url = args[1];
             my_url = args[2];
             string entry_url = null;
-
-            if (args.Length > 3)
-            {
-                entry_url = args[3];
-                hasEntryUrl = true;
-                connectEntryUrl(entry_url);
-            }
 
             init(args);
 
@@ -51,7 +46,13 @@ namespace Worker
             {
                 System.Console.WriteLine(" --> JobTracker is alive!");
             }
-
+            Thread.Sleep(3000);
+            if (args.Length > 3)
+            {
+                entry_url = args[3];
+                hasEntryUrl = true;
+                connectEntryUrl(entry_url);
+            }
             //connectPuppetMaster(id, puppet_master_url, worker_url);
             //channel.StopListening(null);
             //System.Console.WriteLine("channel.StopListening");
@@ -78,20 +79,36 @@ namespace Worker
 
             try
             {
-                job_tracker_url = newWorker.getJobTrackerUrl();
-
-                IJobTracker newJobTracker =
+                job_trackers_url = new Hashtable(newWorker.getJobTrackerUrls());
+                Console.WriteLine("########## job_trackers_url SIZE: " + job_trackers_url.Count);
+                foreach (DictionaryEntry job_tracker_pair in job_trackers_url) {
+                    Console.WriteLine("///> TESTE 0");
+                    IJobTracker job_tracker =
                 (IJobTracker)Activator.GetObject(
-                       typeof(IJobTracker), job_tracker_url);
+                       typeof(IJobTracker), (string)job_tracker_pair.Value);
+                    Console.WriteLine("///> TESTE 1");
+                    job_tracker.registerNewWorker(my_id, my_url);
+                    Console.WriteLine("///> TESTE 2");
+                }
+                Console.WriteLine("///> TESTE 3");
+                System.Console.WriteLine("Connect and registerd in worker --- " + my_url);
+                Console.WriteLine("my_job_tracker_url = " + my_job_tracker_url);
+                IJobTracker my_job_tracker =
+                (IJobTracker)Activator.GetObject(
+                       typeof(IJobTracker), my_job_tracker_url);
 
-                newJobTracker.registerNewWorker(my_id, my_url);
+                foreach (DictionaryEntry pair in job_trackers_url)
+                {
+                    my_job_tracker.getWorkers((string)job_trackers_url[pair.Key]);
+                    break;
+                }
 
-                System.Console.WriteLine("Connect and registerd in worker - " + my_url);
                 return true;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Fail! " + e.ToString());
+                Console.WriteLine("Fail! " + e.Message);
                 return false;
             }
         }
@@ -174,7 +191,7 @@ namespace Worker
         Boolean freeze = false;
         object ClassMap;
         string jobTrackerMaster;
-        Hashtable jobTrackers = new Hashtable();
+        //Hashtable jobTrackers = new Hashtable();
 
         public WorkerServices()
         {
@@ -290,23 +307,33 @@ namespace Worker
 
         public void RegisterJobTracker(int id, string url_JobTracker)
         {
-            jobTrackers.Add(id, url_JobTracker);
+            Worker.my_job_tracker_url = url_JobTracker;
+            Console.WriteLine("%%%%%%%%%%  my_job_tracker_url = url_JobTracker: " + url_JobTracker);
+            Worker.job_trackers_url.Add(id, url_JobTracker);
+
             int maxId = 0;
 
-            foreach (DictionaryEntry pair in jobTrackers) {
-                if ((int)pair.Key > maxId) {
+            foreach (DictionaryEntry pair in Worker.job_trackers_url)
+            {
+                if ((int)pair.Key > maxId)
+                {
                     maxId = (int)pair.Key;
                 }
             }
 
-            jobTrackerMaster = (string)jobTrackers[maxId];
-            // Save url for send the client
+            jobTrackerMaster = (string)Worker.job_trackers_url[maxId];
+            
         }
 
 
         public string getJobTrackerUrl()
         {
             return jobTrackerMaster;
+        }
+
+        public Hashtable getJobTrackerUrls()
+        {
+            return Worker.job_trackers_url;
         }
     }
     
@@ -391,10 +418,7 @@ namespace Worker
 
         public class JobTrackerServices : MarshalByRefObject, IJobTracker
         {
-            public JobTrackerServices()
-            {
-
-            }
+            public JobTrackerServices() {}
 
             public void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited)
             {
@@ -475,7 +499,10 @@ namespace Worker
 
                 try
                 {
-                    workers.Add(worker_id, newWorker);
+                    if (!workers.ContainsKey(worker_id))
+                    {
+                        workers.Add(worker_id, newWorker);
+                    }
                     workers_url.Add(worker_id, worker_url);
                     System.Console.WriteLine("Connect and registerd in worker ID {0} - {1}",worker_id, worker_url);
                     return true;
@@ -486,6 +513,40 @@ namespace Worker
                     return false;
                 }
             }
+
+            public Hashtable sendWorkers(){
+                return workers_url;
+            }
+
+
+            public void getWorkers(string job_tracker_url)
+            {
+                IJobTracker newJobTracker =
+                (IJobTracker)Activator.GetObject(
+                       typeof(IJobTracker), job_tracker_url);
+
+                try
+                {
+                    foreach (DictionaryEntry pair in newJobTracker.sendWorkers())
+                    {
+                        if (!workers_url.ContainsKey(pair.Key))
+                        {
+                            workers_url.Add(pair.Key, pair.Value);
+                            IWorker newWorker =
+                            (IWorker)Activator.GetObject(
+                                   typeof(IWorker), (string)pair.Value);
+                            workers.Add(pair.Key, newWorker);
+                            Console.WriteLine("######pair.Key:" + pair.Key + "##pair.Value:" + pair.Value);
+                        }
+                        
+                    }
+
+                } catch (Exception e)
+                {
+                    Console.WriteLine("Fail! " + e.ToString());
+                }
+            }
+
         }
     }
 }

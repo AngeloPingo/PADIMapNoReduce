@@ -29,11 +29,8 @@ namespace Client
         static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
         static string path_dlls = Path.Combine(@"..\..\..\..\dlls\");
 
-	  // This is the call that the AsyncCallBack delegate will reference.
         public static void OurRemoteAsyncCallBack(IAsyncResult ar)
         {
-            
-            // Alternative 2: Use the callback to get the return value
             RemoteAsyncDelegate del = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
             System.Console.WriteLine("SUCCESS: Result of the remote AsyncCallBack - " + del.EndInvoke(ar).Count);
             words_mapped.Add(del.EndInvoke(ar));
@@ -64,7 +61,6 @@ namespace Client
             string dll = args[5];
             init(args);
             files_splited = splitFile(file, num_splits);
-            //connectPuppetMaster();
             connectIWorker(dll, imap_name_class, entry_url);
             System.Console.ReadLine();
         }
@@ -94,70 +90,6 @@ namespace Client
                 Console.WriteLine("Client-Exception Trace: {0}", e.ToString());
             }
             Environment.CurrentDirectory = path;
-
-            //string path = Directory.GetCurrentDirectory();
-            //Environment.CurrentDirectory = path_dlls;
-            //foreach (DictionaryEntry worker in workers_url)
-            //{
-            //    System.Console.WriteLine((int)worker.Key + " connectIWorker: " + worker.Value);
-            //    IWorker newIWorker =
-            //        (IWorker)Activator.GetObject(
-            //               typeof(IWorker), (string)worker.Value);
-            //    workers.Add(newIWorker);
-            //}
-            //System.Console.WriteLine("connectWorkers!");
-
-            //int num_jobs = files_splited.Count;
-            //int num_workers = workers.Count;
-            //System.Console.WriteLine("Num workers: " + num_workers);
-            //System.Console.WriteLine("num_jobs: " + num_jobs);
-
-            //try
-            //{
-            //    byte[] code = File.ReadAllBytes(dll);
-            //    for (int i = 0; i < num_jobs; i++)
-            //    {
-            //        int index = ((i + num_workers) % num_workers);
-            //        //System.Console.WriteLine("Index: " + index);
-            //        IWorker current_worker = workers[index];
-            //        RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(current_worker.SendMapper);
-            //        AsyncCallback RemoteCallback = new AsyncCallback(Client.OurRemoteAsyncCallBack);
-            //        System.Console.WriteLine("File send: " + files_splited[i + 1]);
-            //        IAsyncResult RemAr = RemoteDel.BeginInvoke(code, imap_name_class, (String)files_splited[i + 1],
-            //            RemoteCallback, null);
-            //        //Thread.Sleep(2 * 1000);
-            //    }
-            //}
-            //catch (SocketException)
-            //{
-            //    System.Console.WriteLine("Could not locate server");
-            //}
-            //System.Console.WriteLine("Task finished!");
-
-            //Environment.CurrentDirectory = path;
-            //System.Console.ReadLine();
-        }
-
-        private static void connectPuppetMaster()
-        {
-            //System.Console.WriteLine("Enter: void connectPuppetMaster(string id, string puppet_master_url, string worker_url)");
-            //string puppet_master_url = "tcp://localhost:20001/PM";
-            //IPuppetMaster newPuppetMaster =
-            //    (IPuppetMaster)Activator.GetObject(
-            //           typeof(IPuppetMaster), puppet_master_url);
-            //System.Console.WriteLine("connectPuppetMaster!");
-
-            //try
-            //{
-            //    workers_url = newPuppetMaster.getWorkers();
-            //    System.Console.WriteLine("List workers recived!");
-
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine("Fail! " + e.Message);
-            //}
-
         }
 
         private static void init(string[] args)
@@ -191,8 +123,6 @@ namespace Client
 
         public static Hashtable splitFile(String file, int num_splits_string)
         {
-            //string path = Directory.GetCurrentDirectory();
-            //Environment.CurrentDirectory = path_files;
             Hashtable files_splited = getHastable();
             System.Console.WriteLine("Enter: splitFile({0}, {1})", file, num_splits_string);
             if (!File.Exists(file))
@@ -217,7 +147,6 @@ namespace Client
                 files_splited[i] = path_file_temp;
                 System.Console.WriteLine("Write File: " + files_splited[i]);
             }
-            //Environment.CurrentDirectory = path;
             return files_splited;
         }
 

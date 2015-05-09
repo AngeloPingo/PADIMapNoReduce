@@ -40,11 +40,15 @@ namespace PADIMapNoReduceServices
         void UnFreezeC();
         void RegisterJobTracker(int id, string url_JobTracker);
         string getJobTrackerUrl();
+        Hashtable getJobTrackerUrls();
     }
     public interface IJobTracker
     {
         bool registerNewWorker(int worker_id, string worker_url);
         void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited);
+        Hashtable sendWorkers();
+        void getWorkers(string job_tracker_url);
+
     }
 
 }
