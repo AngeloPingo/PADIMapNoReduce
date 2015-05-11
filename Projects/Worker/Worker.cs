@@ -206,6 +206,7 @@ namespace Worker
     {
         //List<IPuppetMaster> clients;
         Boolean freeze = false;
+        Boolean slow = false;
         object ClassMap;
         string jobTrackerMaster;
         //Hashtable jobTrackers = new Hashtable();
@@ -230,6 +231,11 @@ namespace Worker
                 // Walk through each type in the assembly looking for our class
                 foreach (Type type in assembly.GetTypes())
                 {
+                    do
+                    {
+                       
+                    } while (slow == true);
+
                     //System.Console.WriteLine("### $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ ###");
                     if (type.IsClass == true)
                     {
@@ -282,9 +288,11 @@ namespace Worker
 
         public void SlowW(int secs)
         {
+            slow = true;
             System.Console.WriteLine("WORKER -- SLOW DURANTE 5 SEGUNDOS");
             System.Threading.Thread.Sleep(secs * 1000);
             System.Console.WriteLine("WORKER -- ACTIVE!!!!");
+            slow = false;
         }
 
         public void FreezeW()
