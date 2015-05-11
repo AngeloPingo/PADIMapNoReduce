@@ -218,6 +218,10 @@ namespace Worker
 
         public bool SendMapper(byte[] code, string className, string splited_file_path)
         {
+            do{
+
+            }while(freeze == true);
+
             System.Console.WriteLine("Enter in SendMapper(code, {0}, {1})", className, splited_file_path);
             //System.Console.WriteLine("code: " + code);
             //System.Console.WriteLine("className: " + className);
@@ -298,25 +302,26 @@ namespace Worker
         public void FreezeW()
         {
             if (freeze == true) {
-                System.Console.WriteLine("Ja esta freeze!");
+                System.Console.WriteLine("WORKER -- JA ESTA EM MODO FREEZE!");
+
             }
             else
             {
                 freeze = true;
-                System.Console.WriteLine("Freeze!");
-            }            
+                System.Console.WriteLine("WORKER -- FREEZE!");
+           }            
         }
 
         public void UnFreezeW()
         {
             if (freeze == false)
             {
-                System.Console.WriteLine("Ja NAO esta freeze!");
+                System.Console.WriteLine("WORKER -- Ja NAO esta freeze!");
             }
             else
             {
                 freeze = false;
-                System.Console.WriteLine("NOT Freeze!");
+                System.Console.WriteLine("WORKER -- ACTIVE!!!!");
             } 
         }
 
