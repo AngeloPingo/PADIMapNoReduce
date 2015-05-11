@@ -289,7 +289,7 @@ namespace Worker
         public void SlowW(int secs)
         {
             slow = true;
-            System.Console.WriteLine("WORKER -- SLOW DURANTE 5 SEGUNDOS");
+            System.Console.WriteLine("WORKER -- SLOW DURANTE " + secs + " SEGUNDOS");
             System.Threading.Thread.Sleep(secs * 1000);
             System.Console.WriteLine("WORKER -- ACTIVE!!!!");
             slow = false;
