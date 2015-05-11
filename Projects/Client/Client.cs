@@ -26,7 +26,7 @@ namespace Client
         private static IWorker newIWorker;
         private static IJobTracker jobTracker;
         //static string path_files = Path.Combine(@"..\..\..\..\files\");
-        static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
+        static string path_files = Path.Combine(@"C:\Users\Carlos\Source\Repos\PADIMapNoReduce\files\");
         static string path_dlls = Path.Combine(@"..\..\..\..\dlls\");
 
         public static void OurRemoteAsyncCallBack(IAsyncResult ar)
@@ -76,12 +76,25 @@ namespace Client
                 Console.WriteLine("Created code");
                 newIWorker = (IWorker)Activator.GetObject(typeof(IWorker), entry_url);
                 Console.WriteLine("Created connection to newIWorker");
-                jobTracker_url = newIWorker.getJobTrackerUrl();
-                Console.WriteLine("getJobTrackerUrl() = " + jobTracker_url);
-                jobTracker = (IJobTracker)Activator.GetObject(typeof(IJobTracker), jobTracker_url);
-                Console.WriteLine("Created connection to jobTracker");
-                jobTracker.spreadJobs(code, imap_name_class, (Hashtable)files_splited);
-                Console.WriteLine("spreadJobs(code, {0}, Jobs={1})", imap_name_class, files_splited.Count);
+                //jobTracker_url = newIWorker.getJobTrackerUrl();
+                Hashtable jobTrackerUrls =newIWorker.getJobTrackerUrls();
+                foreach (DictionaryEntry pair in jobTrackerUrls)
+                {
+                    try
+                    {
+                        Console.WriteLine("Trying jobTracker: " + pair.Value);
+                        jobTracker = (IJobTracker)Activator.GetObject(typeof(IJobTracker), (string)pair.Value);
+                        Console.WriteLine("Created connection to jobTracker");
+                        jobTracker.spreadJobs(code, imap_name_class, (Hashtable)files_splited);
+                        Console.WriteLine("spreadJobs(code, {0}, Jobs={1})", imap_name_class, files_splited.Count);
+                        break;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("JT invalido, tentando novo JT.");
+                        continue;
+                    }
+                }
             }
             catch (Exception e)
             {
