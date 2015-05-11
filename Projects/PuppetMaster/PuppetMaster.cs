@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,7 +20,7 @@ namespace PuppetMaster
 {
     public partial class PuppetMaster : Form
     {
-        Hashtable workers;
+        Hashtable workers = new Hashtable();
         int port = 20001;
         string puppet_master_name = "PM";
         string worker_name = "/W";
@@ -30,6 +30,7 @@ namespace PuppetMaster
         string[] filelines = null;
 
         public delegate void RemoteAsyncDelegate();
+        public delegate void RemoteAsyncDelegate2(int delay);
         public PuppetMaster()
         {
             InitializeComponent();
@@ -186,7 +187,7 @@ namespace PuppetMaster
             {
                 case "WORKER":
                     //System.Console.WriteLine("Enter command: WORKER-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 5)
+                    if (lineSplitted.Length == 5 || lineSplitted.Length == 6)
                     {
                         //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
@@ -222,9 +223,9 @@ namespace PuppetMaster
                     break;
                 case "SLOWW":
                     //System.Console.WriteLine("Enter command: SLOWW-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 3)
+                    if (lineSplitted.Length == 4)
                     {
-                        //printArgs(lineSplitted);
+                        printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
                         launchSloww(args);
                     }
@@ -293,7 +294,17 @@ namespace PuppetMaster
 
         private void launchSloww(string[] args)
         {
-            throw new NotImplementedException();
+            int id_Worker = Convert.ToInt32(args[0]);
+            string worker_url = (string)workers[id_Worker];
+            System.Console.WriteLine("OLA"+worker_url);
+            int delay = Convert.ToInt32(args[1]);
+
+            IWorker newIWorker =
+                (IWorker)Activator.GetObject(
+                       typeof(IWorker), worker_url);
+
+            RemoteAsyncDelegate2 RemoteDel = new RemoteAsyncDelegate2(newIWorker.SlowW);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(delay, null, null);
         }
 
         private void launchStatus()
@@ -339,6 +350,8 @@ namespace PuppetMaster
             string service_url = args[2];
             string entry_url = args[3];
             String[] parametros = new String[] { id, puppet_url, service_url, entry_url };
+            workers[Convert.ToInt32(id)] = service_url;
+            System.Console.WriteLine("Estamos aqui" + id + "service" + workers[Convert.ToInt32(id)]);
 
             try
             {
@@ -404,7 +417,7 @@ namespace PuppetMaster
             {
                 bool isFinish = true;
                 progressBar_script.Minimum = 0;
-                progressBar_script.Maximum = filelines.Length - 1;
+                progressBar_script.Maximum = filelines.Length;
                 for (int i = 0; i < filelines.Length; i++)
                 {
                     if (filelines[i].Length > 0)
@@ -436,7 +449,7 @@ namespace PuppetMaster
     public class PuppetMasterServices : MarshalByRefObject, IPuppetMaster
     {
         public static PuppetMaster form;
-        static public Hashtable workers = new Hashtable();
+        //static public Hashtable workers = new Hashtable();
 
         public PuppetMasterServices()
         {
@@ -444,13 +457,17 @@ namespace PuppetMaster
 
         public Hashtable getWorkers()
         {
-            return workers;
+            return null;
+            //throw new NotImplementedException();
+            //  return workers;
         }
 
         public void RegisterWorker(int id_worker, string worker_url)
         {
-            workers[id_worker] = worker_url;
-            System.Console.WriteLine("Service URL: ");
+            
+            //throw new NotImplementedException();
+            //workers[id_worker] = worker_url;
+            //System.Console.WriteLine("Service URL: ");
 
         }
         public void RegisterClient(string NewClientPort) {
