@@ -23,12 +23,13 @@ namespace PADIMapNoReduceServices
 
     public interface IMapperTransfer
     {
-        bool SendMapper(byte[] code, string className, string splited_file_path);
+        bool SendMapper(byte[] code, string className, int num_job, string client_url);
     }
 
     public interface IClient
     {
-        void SendResults(string result);
+        void SendSplitResults(IList<KeyValuePair<string, string>> result, string file_name);
+        string GetJobById(int job_id);
     }
 
     public interface IWorker : IMapperTransfer
@@ -45,7 +46,7 @@ namespace PADIMapNoReduceServices
     public interface IJobTracker
     {
         bool registerNewWorker(int worker_id, string worker_url);
-        void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited);
+        void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url);
         Hashtable sendWorkers();
         void getWorkers(string job_tracker_url);
 

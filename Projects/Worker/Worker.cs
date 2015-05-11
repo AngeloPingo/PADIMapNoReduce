@@ -11,6 +11,7 @@ using PADIMapNoReduceServices;
 using System.IO;
 using System.Collections;
 using System.Reflection;
+using System.Net.Sockets;
 
 namespace Worker
 {
@@ -205,29 +206,39 @@ namespace Worker
     public class WorkerServices : MarshalByRefObject, IWorker
     {
         //List<IPuppetMaster> clients;
+        //Hashtable jobTrackers = new Hashtable();
         Boolean freeze = false;
         Boolean slow = false;
         object ClassMap;
         string jobTrackerMaster;
-        //Hashtable jobTrackers = new Hashtable();
 
         public WorkerServices()
         {
             //clients = new List<IPuppetMaster>();
         }
 
-        public bool SendMapper(byte[] code, string className, string splited_file_path)
+        public bool SendMapper(byte[] code, string className, int num_job, string client_url)
         {
             do{
+                Thread.Sleep(100);
 
             }while(freeze == true);
 
-            System.Console.WriteLine("Enter in SendMapper(code, {0}, {1})", className, splited_file_path);
+            //System.Console.WriteLine("Enter in SendMapper(code, {0}, {1})", className, splited_file_path);
             //System.Console.WriteLine("code: " + code);
             //System.Console.WriteLine("className: " + className);
             //System.Console.WriteLine("splited_file_path: " + splited_file_path);
-            //if (!freeze)
-            //{
+
+            string Jobline = null;
+            IClient newClient = (IClient)Activator.GetObject(typeof(IClient), client_url);
+            try
+            {
+                Jobline = newClient.GetJobById(num_job);
+                Console.WriteLine("--------->  num_job: " + num_job);
+            } catch (Exception e) {
+                Console.WriteLine("Exception: " + e.ToString());
+            }
+
             try
                             {
                 Assembly assembly = Assembly.Load(code);
@@ -247,7 +258,7 @@ namespace Worker
                         {
                             ClassMap = Activator.CreateInstance(type);
 
-                            object[] args = new object[] { splited_file_path };
+                            object[] args = new object[] { Jobline };
                             //System.Console.WriteLine("MAP!! - " + splited_file_path);
                             object resultObject = null;
                             
@@ -256,9 +267,12 @@ namespace Worker
                                    null,
                                    ClassMap,
                                    args);
-                            
-                            IList<KeyValuePair<string, string>> result = (IList<KeyValuePair<string, string>>)resultObject;
+                            IList<KeyValuePair<string, string>> result = null;
+                            result = (IList<KeyValuePair<string, string>>)resultObject;
+                            newClient.SendSplitResults(result, num_job + "");
+
                             // FALTA GUARDAR RESULTADO NOS FICHEIROS COM O NOME OUTPUT
+
                             //Console.WriteLine("Map call result was: ");
                             //foreach (KeyValuePair<string, string> p in result)
                             //{
@@ -286,7 +300,6 @@ namespace Worker
                 Console.WriteLine("Worker-Exception Trace: {0}", e.ToString());
             }
                 throw (new System.Exception("could not invoke method"));
-            //}
         }
 
 
@@ -462,49 +475,50 @@ namespace Worker
 
         public class JobTrackerServices : MarshalByRefObject, IJobTracker
         {
+
+            Hashtable unsucess_jobs = new Hashtable();
             public JobTrackerServices() {}
 
-            public void spreadJobs(byte[] code, string imap_name_class, Hashtable files_splited)
+            public void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url)
             {
                 System.Console.WriteLine("connectWorkers!");
 
-                int num_jobs = files_splited.Count;
                 int num_workers = workers.Count;
                 Hashtable JobDistribution = new Hashtable(num_workers);
                 List<int> keys = workers.Keys.Cast<int>().ToList();
                 System.Console.WriteLine("Num workers: " + num_workers);
-                System.Console.WriteLine("num_jobs: " + num_jobs);
+                System.Console.WriteLine("num_jobs: {0} no cliente: {1}", num_jobs, client_url);
                 
-                for (int i = 0; i < num_jobs; i++)
+                for (int i = 1; i <= num_jobs; i++)
                 {
                     int index = ((i + num_workers) % num_workers);
                     if (JobDistribution.ContainsKey(keys[index]))
                     {
-                        List<string> splitsWorker = (List<string>)JobDistribution[keys[index]];
-                        splitsWorker.Add((String)files_splited[i + 1]);
-                        JobDistribution[keys[index]] = splitsWorker;
+                        List<int> JobsIdToWorker = (List<int>)JobDistribution[keys[index]];
+                        JobsIdToWorker.Add(i);
+                        int worker_id = keys[index];
+                        JobDistribution[worker_id] = JobsIdToWorker;
                     }
                     else
                     {
-                        List<string> splitsWorker = new List<string>();
-                        splitsWorker.Add((String)files_splited[i + 1]);
-                        JobDistribution.Add(keys[index], splitsWorker);
-                    }
-                    //System.Console.WriteLine("Index: " + index);
-                    
+                        List<int> JobsIdToWorker = new List<int>();
+                        JobsIdToWorker.Add(i);
+                        int worker_id = keys[index];
+                        JobDistribution.Add(worker_id, JobsIdToWorker);
+                    }                    
                 }
 
                 foreach (DictionaryEntry pair in JobDistribution)
                 {
-                    Console.WriteLine("Job send to {0}, with {1} splits!", (int)pair.Key, ((List<string>)pair.Value).Count);
-                    Thread thread = new Thread(() => sendJobToWorker((int)pair.Key, code, imap_name_class, (List<string>)pair.Value));
+                    Console.WriteLine("Job send to {0}, with {1} splits!", (int)pair.Key, ((List<int>)pair.Value).Count);
+                    Thread thread = new Thread(() => sendJobToWorker((int)pair.Key, code, imap_name_class, (List<int>)pair.Value, client_url));
                     thread.Start();
                 }
                 
                 System.Console.WriteLine("Task finished!");
             }
 
-            private bool sendJobToWorker(int worker_id, byte[] code, string imap_name_class, List<string> files_splited)
+            private bool sendJobToWorker(int worker_id, byte[] code, string imap_name_class, List<int> JobsIdToWorker, string client_url)
             {
                 //int worker_id;
                 //byte[] code;
@@ -513,17 +527,27 @@ namespace Worker
                 bool isSucess = true;
                 Console.WriteLine("worker_id: " + worker_id);
 
-                foreach (string value_string in files_splited)
+                foreach (int job_id in JobsIdToWorker)
                 {
-                    Console.WriteLine("\t" + imap_name_class + "\t" + worker_id + " - " + value_string);
-                    IWorker newWorker = (IWorker)workers[worker_id];
-                    if (!(newWorker.SendMapper(code, imap_name_class, value_string)))
+                    Console.WriteLine("\t" + imap_name_class + "\t" + worker_id + " - " + job_id);
+                    try
                     {
-                        isSucess = false;
+                        IWorker newWorker = (IWorker)workers[worker_id];
+                        if (!(newWorker.SendMapper(code, imap_name_class, job_id, client_url)))
+                        {
+                            isSucess = false;
+                        }
+                        else
+                        {
+                            unsucess_jobs.Add(job_id, client_url);
+                        }
+                    }
+                    catch (Exception se){
+                        Console.WriteLine("Worker {0} FAIL: {1}", worker_id, se.Message);
+                        workers.Remove(worker_id);
+                        unsucess_jobs.Add(job_id, client_url);
                     }
                     Console.WriteLine("isSucess: " + isSucess);
-                    //Thread.Sleep(3 * 1000);
-                    //break; // tirar break assim so faz o primeiro split
                 }
                 return isSucess;
             }

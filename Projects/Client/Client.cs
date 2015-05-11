@@ -26,8 +26,12 @@ namespace Client
         private static IWorker newIWorker;
         private static IJobTracker jobTracker;
         //static string path_files = Path.Combine(@"..\..\..\..\files\");
-        static string path_files = Path.Combine(@"C:\Users\Carlos\Source\Repos\PADIMapNoReduce\files\");
+        static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
         static string path_dlls = Path.Combine(@"..\..\..\..\dlls\");
+        private static string client_name = "C";
+        private static string url_tcp = "tcp://localhost:";
+        private static string client_service;
+        private static string output_path;
 
         public static void OurRemoteAsyncCallBack(IAsyncResult ar)
         {
@@ -59,24 +63,22 @@ namespace Client
             int num_splits = Convert.ToInt32(args[3]);
             string imap_name_class = args[4];
             string dll = args[5];
-            init(args);
             files_splited = splitFile(file, num_splits);
-            connectIWorker(dll, imap_name_class, entry_url);
+            init(args);
+            connectIWorker(dll, imap_name_class, entry_url, num_splits);
             System.Console.ReadLine();
         }
 
-        private static void connectIWorker(string dll, string imap_name_class, string entry_url)
+        private static void connectIWorker(string dll, string imap_name_class, string entry_url, int num_splits)
         {
             string path = Directory.GetCurrentDirectory();
             Environment.CurrentDirectory = path_dlls;
-            string jobTracker_url;
             try
             {
                 byte[] code = File.ReadAllBytes(dll);
                 Console.WriteLine("Created code");
                 newIWorker = (IWorker)Activator.GetObject(typeof(IWorker), entry_url);
                 Console.WriteLine("Created connection to newIWorker");
-                //jobTracker_url = newIWorker.getJobTrackerUrl();
                 Hashtable jobTrackerUrls =newIWorker.getJobTrackerUrls();
                 foreach (DictionaryEntry pair in jobTrackerUrls)
                 {
@@ -85,13 +87,13 @@ namespace Client
                         Console.WriteLine("Trying jobTracker: " + pair.Value);
                         jobTracker = (IJobTracker)Activator.GetObject(typeof(IJobTracker), (string)pair.Value);
                         Console.WriteLine("Created connection to jobTracker");
-                        jobTracker.spreadJobs(code, imap_name_class, (Hashtable)files_splited);
+                        jobTracker.spreadJobs(code, imap_name_class, num_splits, client_service);
                         Console.WriteLine("spreadJobs(code, {0}, Jobs={1})", imap_name_class, files_splited.Count);
                         break;
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("JT invalido, tentando novo JT.");
+                        Console.WriteLine("JT invalido, tentando novo JT: " + e.Message);
                         continue;
                     }
                 }
@@ -107,15 +109,13 @@ namespace Client
 
         private static void init(string[] args)
         {
-            int port = 10001;
+            Random rnd = new Random();
+            int port = 10001 + rnd.Next(19999 - 10001);
+            client_service = url_tcp + port + "/" + client_name;
             String entry_url = args[0];
             String path_file = args[1];
-            String output_path = args[2];
-            int num_splits = Convert.ToInt32(args[3]);
-            
-
-            
-
+            output_path = args[2];
+            int num_splits = Convert.ToInt32(args[3]); 
             char[] delimiter = { '/', ':' };
             String[] url_splited = entry_url.Split(delimiter);
             // int port = Convert.ToInt32(url_splited[4]);
@@ -123,14 +123,13 @@ namespace Client
 
             TcpChannel channel = new TcpChannel(port);
             ChannelServices.RegisterChannel(channel, false);
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(ClientServices), "Clients",
-                WellKnownObjectMode.Singleton);
+            ClientServices servicos = new ClientServices(files_splited, output_path);
 
+            RemotingServices.Marshal(servicos, client_name, typeof(ClientServices));
 
             System.Console.WriteLine("Entry URL: " + entry_url);
             System.Console.WriteLine("Connnected in port: " + port);
-            System.Console.WriteLine("Service: " + service);
+            System.Console.WriteLine("Client service: " + client_service);
             System.Console.WriteLine("Press <enter> to terminate chat server...");
         }
 
@@ -151,14 +150,14 @@ namespace Client
             int j = 0;
             for (int i = 1; i <= num_splits_string; i++)
             {
-                string path_file_temp = path_files + i + ".out";
+                string path_file_temp = path_files + i + ".in";
                 StreamWriter file_temp = new StreamWriter(path_file_temp);                
                 while (j < num_lines_by_split * i || (i == num_splits_string && j < num_lines)) {
                     file_temp.WriteLine(reader_file[j++]);
                 }
                 file_temp.Close();
                 files_splited[i] = path_file_temp;
-                System.Console.WriteLine("Write File: " + files_splited[i]);
+                System.Console.WriteLine("{0}  -> Write File: {1}", i, files_splited[i]);
             }
             return files_splited;
         }
@@ -166,23 +165,63 @@ namespace Client
 
     }
 
-    class ClientServices : MarshalByRefObject, IClient, IMapper
+    public class ClientServices : MarshalByRefObject, IClient
     {
-        List<string> messages;
+        Hashtable files_splited = null;
+        string output_path;
+        static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
 
-        ClientServices()
+        public ClientServices(Hashtable files_split, string output)
         {
-            messages = new List<string>();
-        }     
-
-        public void SendResults(string result)
-        {
-            throw new NotImplementedException();
+            this.files_splited = files_split;
+            this.output_path = output;
         }
 
-        public IList<KeyValuePair<string, string>> Map(string splited_file_path)
+        public void SendSplitResults(IList<KeyValuePair<string, string>> result, string file_name)
         {
-            return null;
+            string result_to_file = "";
+            string path_file = path_files + "/" + output_path + "/" + file_name + ".out";
+            foreach (KeyValuePair<string, string> pair in result)
+            {
+                result_to_file += pair.Key + " --> " + pair.Value + "\n"; 
+            }
+            if (Directory.Exists(path_files + "/" + output_path))
+            {
+                System.IO.File.WriteAllText(path_file, result_to_file);
+            }
+            else
+            {
+                System.IO.Directory.CreateDirectory(path_files + "/" + output_path);
+                System.IO.File.WriteAllText(path_file, result_to_file);
+            }
+        }
+
+        public string GetJobById(int job_id)
+        {
+            string file = (string)files_splited[job_id];
+            string[] reader_file;
+            string string_to_send = "";
+
+            if (File.Exists(file))
+            {
+                reader_file = File.ReadAllLines(file);
+            }
+            else
+            {
+                System.Console.WriteLine("2-Ficheiro não existe: " + file);
+                return null;
+            }
+
+            reader_file = File.ReadAllLines(file);
+            int number_lines = reader_file.Length;
+            Hashtable hash_map_words = new Hashtable();
+
+            foreach (string line in reader_file)
+            {
+                string_to_send = string_to_send + " " + line;
+            }
+
+            return string_to_send;
         }
     }
 

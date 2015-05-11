@@ -8,6 +8,6 @@ namespace MapperTransfer
 {
     public interface IMapperTransfer
     {
-        bool SendMapper(byte[] code, string className, string splited_file_path);
+        bool SendMapper(byte[] code, string className, int num_job, string client_url);
     }
 }
