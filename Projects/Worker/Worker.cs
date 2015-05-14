@@ -481,6 +481,8 @@ namespace Worker
         {
 
             Hashtable unsucess_jobs = new Hashtable();
+            long limitTimeGlobal = 0;
+            object LockLimitTime = new Object();
             public JobTrackerServices() {}
 
             public void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url)
@@ -569,7 +571,7 @@ namespace Worker
                 //string imap_name_class;
                 //List<string> files_splited;
                 Stopwatch stopwatch = new Stopwatch();
-                long limitTime = 0;
+                long limitTimeLocal = 0;
                 long processTime = 0;
                 double bound = 1.2;
                 bool isSucess = true;
@@ -582,7 +584,7 @@ namespace Worker
                     try
                     {
                         IWorker newWorker = (IWorker)workers[worker_id];
-                        if (processTime > limitTime)
+                        if (processTime > limitTimeLocal)
                         {
                             unsucess_jobs.Add(job_id, client_url);
                             Console.WriteLine("!!!!!!!!!! job {0} exceeded the time limit!", job_id);
@@ -599,11 +601,14 @@ namespace Worker
                         else
                         {
                             stopwatch.Stop();
-                            if (limitTime == 0)
+                            //Console.WriteLine("--> limitTime: {3}", job_id, stopwatch.Elapsed, processTime, limitTimeLocal);
+                            if (limitTimeLocal == 0)
                             {
 
                                 processTime = (stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds;
-                                limitTime = (long)(((stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds) * bound);
+
+                                limitTimeLocal = (long)(((stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds) * bound);
+
                                 Console.WriteLine("job {0} FINISH with success!", job_id);
                             }
                             else
@@ -612,10 +617,22 @@ namespace Worker
                                 avg[0] = processTime;
                                 processTime = (stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds;
                                 avg[1] = processTime;
-                                limitTime = (long)(avg.Average() * bound);
+                                limitTimeLocal = (long)(avg.Average() * bound);
+                                lock (LockLimitTime)
+                                {
+                                    if (limitTimeGlobal == 0)
+                                    {
+                                        limitTimeGlobal = limitTimeLocal;
+                                    }
+                                    else
+                                    {
+                                        limitTimeLocal = (limitTimeLocal + limitTimeGlobal) / 2;
+                                    }
+                                    //Console.WriteLine("limitTimeLocal: {0} ; limitTimeGlobal: {1} ", limitTimeLocal, limitTimeGlobal);
+                                }
                             }
                             Console.WriteLine("job {0} FINISH with success!", job_id);
-                            Console.WriteLine("Time elapsed job {0}: {1} in Milliseconds: {2} ; limitTime: {3}", job_id, stopwatch.Elapsed, processTime, limitTime);
+                            Console.WriteLine("Time elapsed job {0}: {1} in Milliseconds: {2} ; limitTime: {3}", job_id, stopwatch.Elapsed, processTime, limitTimeLocal);
                             
                             if (unsucess_jobs.ContainsKey(job_id) && unsucess_jobs[job_id] == client_url)
                             {
