@@ -12,6 +12,7 @@ using System.IO;
 using System.Collections;
 using System.Reflection;
 using System.Net.Sockets;
+using System.Diagnostics;
 
 namespace Worker
 {
@@ -223,7 +224,10 @@ namespace Worker
                 Thread.Sleep(100);
 
             }while(freeze == true);
-
+            //if (num_job == 4)
+            //{
+            //    Thread.Sleep(9000);
+            //}
             //System.Console.WriteLine("Enter in SendMapper(code, {0}, {1})", className, splited_file_path);
             //System.Console.WriteLine("code: " + code);
             //System.Console.WriteLine("className: " + className);
@@ -564,6 +568,10 @@ namespace Worker
                 //byte[] code;
                 //string imap_name_class;
                 //List<string> files_splited;
+                Stopwatch stopwatch = new Stopwatch();
+                long limitTime = 0;
+                long processTime = 0;
+                double bound = 1.2;
                 bool isSucess = true;
                 Console.WriteLine("worker_id: " + worker_id);
 
@@ -574,13 +582,41 @@ namespace Worker
                     try
                     {
                         IWorker newWorker = (IWorker)workers[worker_id];
+                        if (processTime > limitTime)
+                        {
+                            unsucess_jobs.Add(job_id, client_url);
+                            Console.WriteLine("!!!!!!!!!! job {0} exceeded the time limit!", job_id);
+                            continue;
+                        }
+                        stopwatch.Reset();
+                        stopwatch.Start();
                         if (!(newWorker.SendMapper(code, imap_name_class, job_id, client_url)))
                         {
                             unsucess_jobs.Add(job_id, client_url);
                             isSucess = false;
+                            Console.WriteLine("job {0} FAIL !", job_id);
                         }
                         else
                         {
+                            stopwatch.Stop();
+                            if (limitTime == 0)
+                            {
+
+                                processTime = (stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds;
+                                limitTime = (long)(((stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds) * bound);
+                                Console.WriteLine("job {0} FINISH with success!", job_id);
+                            }
+                            else
+                            {
+                                long[] avg = new long[2];
+                                avg[0] = processTime;
+                                processTime = (stopwatch.Elapsed.Seconds * 1000) + stopwatch.Elapsed.Milliseconds;
+                                avg[1] = processTime;
+                                limitTime = (long)(avg.Average() * bound);
+                            }
+                            Console.WriteLine("job {0} FINISH with success!", job_id);
+                            Console.WriteLine("Time elapsed job {0}: {1} in Milliseconds: {2} ; limitTime: {3}", job_id, stopwatch.Elapsed, processTime, limitTime);
+                            
                             if (unsucess_jobs.ContainsKey(job_id) && unsucess_jobs[job_id] == client_url)
                             {
                                 unsucess_jobs.Remove(job_id);
