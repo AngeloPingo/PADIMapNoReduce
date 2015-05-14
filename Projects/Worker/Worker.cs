@@ -242,7 +242,7 @@ namespace Worker
             try
                             {
                 Assembly assembly = Assembly.Load(code);
-                System.Console.WriteLine("assembly.GetTypes(): " + assembly.GetTypes().Length);
+                //System.Console.WriteLine("assembly.GetTypes(): " + assembly.GetTypes().Length);
                 // Walk through each type in the assembly looking for our class
                 foreach (Type type in assembly.GetTypes())
                 {
@@ -278,7 +278,7 @@ namespace Worker
                             //{
                             //    Console.WriteLine("key: " + p.Key + ", value: " + p.Value);
                             //}
-                            Console.WriteLine("Resultado do Map: " + result.Count);
+                            Console.WriteLine("tarefa terminada, resultado do Map: " + result.Count);
                             return result != null;
                         }
                     }
@@ -481,7 +481,8 @@ namespace Worker
 
             public void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url)
             {
-                System.Console.WriteLine("connectWorkers!");
+                //System.Console.WriteLine("connectWorkers!");
+
 
                 int num_workers = workers.Count;
                 Hashtable JobDistribution = new Hashtable(num_workers);
@@ -508,12 +509,51 @@ namespace Worker
                     }                    
                 }
 
+                List<Thread> thread_workers = new List<Thread>();
                 foreach (DictionaryEntry pair in JobDistribution)
                 {
                     Console.WriteLine("Job send to {0}, with {1} splits!", (int)pair.Key, ((List<int>)pair.Value).Count);
                     Thread thread = new Thread(() => sendJobToWorker((int)pair.Key, code, imap_name_class, (List<int>)pair.Value, client_url));
+                    thread.Name = "thread-" + (int)pair.Key;
                     thread.Start();
+                    thread_workers.Add(thread);
                 }
+                foreach (Thread current_thread in thread_workers)
+                {
+                    current_thread.Join();
+                    Console.WriteLine("Thread Join: " + current_thread.Name);
+                }
+
+                thread_workers.Clear();
+                Console.WriteLine("thread_workers SIZE: " + thread_workers.Count);
+
+                while (unsucess_jobs.Count > 0)
+                {
+                    Console.WriteLine("&&&&&&&&&&&&&Unsucess_jobs SIZE: " + unsucess_jobs.Count);
+                    num_workers = workers.Count;
+                        object[] keys_worker = new object[workers.Count];
+                        workers.Keys.CopyTo(keys_worker, 0);
+                    int i = 0;
+                    foreach (DictionaryEntry pair in unsucess_jobs)
+                    {
+                        int index = ((i + num_workers) % num_workers);
+                        int id_worker = (int)keys_worker[index];
+                        //Console.WriteLine("Job send to worker {0}, with job id {1}!", id_worker, ((List<int>)pair.Value));
+                        List<int> jobs_id = new List<int>();
+                        jobs_id.Add((int)pair.Key);
+                        Thread thread = new Thread(() => sendJobToWorker(id_worker, code, imap_name_class, jobs_id, (string)pair.Value));
+                        thread_workers.Add(thread);
+                        thread.Start();
+                        i++;
+                    }
+                    foreach (Thread current_thread in thread_workers)
+                    {
+                        current_thread.Join();
+                        Console.WriteLine("Thread Join: " + current_thread.Name);
+                    }
+                    thread_workers.Clear();
+                }
+
                 
                 System.Console.WriteLine("Task finished!");
             }
@@ -529,23 +569,50 @@ namespace Worker
 
                 foreach (int job_id in JobsIdToWorker)
                 {
-                    Console.WriteLine("\t" + imap_name_class + "\t" + worker_id + " - " + job_id);
+
+                    //Console.WriteLine("\t" + imap_name_class + "\t" + worker_id + " - " + job_id);
                     try
                     {
                         IWorker newWorker = (IWorker)workers[worker_id];
                         if (!(newWorker.SendMapper(code, imap_name_class, job_id, client_url)))
                         {
+                            unsucess_jobs.Add(job_id, client_url);
                             isSucess = false;
                         }
                         else
                         {
-                            unsucess_jobs.Add(job_id, client_url);
+                            if (unsucess_jobs.ContainsKey(job_id) && unsucess_jobs[job_id] == client_url)
+                            {
+                                unsucess_jobs.Remove(job_id);
+                            }
                         }
+
+                    }
+                    catch (SocketException se)
+                    {
+                        Console.WriteLine("{2} --> Worker {0} FAIL: {1}!", worker_id, se.Message, se.GetType());
+                        workers.Remove(worker_id);
+                        workers_urls.Remove(worker_id);
+                        unsucess_jobs.Add(job_id, client_url);
+                        Console.WriteLine('\n' + "///////////TABELA WORKERS NO JT ACTUALIZADA//////");
+                        foreach (DictionaryEntry par in workers_urls)
+                        {
+                            Console.WriteLine("//     ID: " + par.Key + " - URL: " + par.Value + "    //");
+                        }
+                        foreach (DictionaryEntry par in workers)
+                        {
+                            Console.WriteLine("//     ID: " + par.Key);
+                        }
+                        Console.WriteLine("/////////////////////////////////////////////////" + '\n');
+                    }
+                    catch (NullReferenceException se)
+                    {
+                        Console.WriteLine("{2} --> Worker não está na lista workers[{0}]. Message: {1}", worker_id, se.Message, se.GetType());
+                        unsucess_jobs.Add(job_id, client_url);
                     }
                     catch (Exception se){
-                        Console.WriteLine("Worker {0} FAIL: {1}", worker_id, se.Message);
-                        workers.Remove(worker_id);
-                        unsucess_jobs.Add(job_id, client_url);
+                        Console.WriteLine("{2} --> Worker {0} Message: {1}", worker_id, se.Message, se.GetType());
+                        //unsucess_jobs.Add(job_id, client_url);
                     }
                     Console.WriteLine("isSucess: " + isSucess);
                 }

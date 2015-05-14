@@ -91,9 +91,9 @@ namespace Client
                         Console.WriteLine("spreadJobs(code, {0}, Jobs={1})", imap_name_class, files_splited.Count);
                         break;
                     }
-                    catch (Exception e)
+                    catch (SocketException e)
                     {
-                        Console.WriteLine("JT invalido, tentando novo JT: " + e.Message);
+                        Console.WriteLine("JT invalido, tentando novo JT: " + e.Message + "\nType: " + e.GetType());
                         continue;
                     }
                 }
