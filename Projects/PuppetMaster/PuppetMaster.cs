@@ -284,12 +284,26 @@ namespace PuppetMaster
 
         private void launchUnfreezew(string[] args)
         {
-            throw new NotImplementedException();
+            int id_Worker = Convert.ToInt32(args[0]);
+            string worker_url = (string)workers[id_Worker];
+            IWorker newIWorker =
+                (IWorker)Activator.GetObject(
+                       typeof(IWorker), worker_url);
+
+            RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIWorker.UnFreezeW);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
         }
 
         private void launchFreezew(string[] args)
         {
-            throw new NotImplementedException();
+            int id_Worker = Convert.ToInt32(args[0]);
+            string worker_url = (string)workers[id_Worker];
+            IWorker newIWorker =
+                (IWorker)Activator.GetObject(
+                       typeof(IWorker), worker_url);
+
+            RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIWorker.FreezeW);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
         }
 
         private void launchSloww(string[] args)
