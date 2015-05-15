@@ -37,8 +37,6 @@ namespace PADIMapNoReduceServices
         void SlowW(int secs);
         void FreezeW();
         void UnFreezeW();
-        void FreezeC();
-        void UnFreezeC();
         void RegisterJobTracker(int id, string url_JobTracker);
         string getJobTrackerUrl();
         Hashtable getJobTrackerUrls();
@@ -49,6 +47,8 @@ namespace PADIMapNoReduceServices
         void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url);
         Hashtable sendWorkers();
         void getWorkers(string job_tracker_url);
+        void FreezeC();
+        void UnFreezeC();
 
     }
 

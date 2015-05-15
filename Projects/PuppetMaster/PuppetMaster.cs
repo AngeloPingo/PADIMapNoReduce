@@ -274,12 +274,40 @@ namespace PuppetMaster
 
         private void launchUnfreezec(string[] args)
         {
-            throw new NotImplementedException();
+            int id_Worker = Convert.ToInt32(args[0]);
+            string worker_url = (string)workers[id_Worker];
+            char[] delimiterChars = { ':', '/' };
+            String[] lineSplitted = worker_url.Split(delimiterChars);
+            string service_job_tracker = "JobTracker";
+            string url_tcp = "tcp://localhost:";
+            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[1]);
+            string job_url = url_tcp + port_job_tracker + "/" + service_job_tracker;
+
+            IJobTracker newIJobTracker =
+                (IJobTracker)Activator.GetObject(
+                       typeof(IJobTracker), job_url);
+
+            RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIJobTracker.UnFreezeC);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
         }
 
         private void launchFreezec(string[] args)
         {
-            throw new NotImplementedException();
+            int id_Worker = Convert.ToInt32(args[0]);
+            string worker_url = (string)workers[id_Worker];
+            char[] delimiterChars = { ':', '/' };
+            String[] lineSplitted = worker_url.Split(delimiterChars);
+            string service_job_tracker = "JobTracker";
+            string url_tcp = "tcp://localhost:";
+            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[1]);
+            string job_url = url_tcp + port_job_tracker + "/" + service_job_tracker;
+
+            IJobTracker newIJobTracker =
+                (IJobTracker)Activator.GetObject(
+                       typeof(IJobTracker), job_url);
+
+            RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIJobTracker.FreezeC);
+            IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
         }
 
         private void launchUnfreezew(string[] args)

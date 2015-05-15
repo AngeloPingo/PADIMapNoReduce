@@ -342,18 +342,6 @@ namespace Worker
             } 
         }
 
-        public void FreezeC()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UnFreezeC()
-        {
-            throw new NotImplementedException();
-        }
-
-
-
         public void RegisterJobTracker(int id, string url_JobTracker)
         {
             //Worker.my_job_tracker_url = url_JobTracker;
@@ -484,6 +472,7 @@ namespace Worker
             long limitTimeGlobal = 0;
             object LockLimitTime = new Object();
             public JobTrackerServices() {}
+            Boolean freeze = false;
 
             public void spreadJobs(byte[] code, string imap_name_class, int num_jobs, string client_url)
             {
@@ -495,7 +484,10 @@ namespace Worker
                 List<int> keys = workers.Keys.Cast<int>().ToList();
                 System.Console.WriteLine("Num workers: " + num_workers);
                 System.Console.WriteLine("num_jobs: {0} no cliente: {1}", num_jobs, client_url);
-                
+                do
+                {
+                    Thread.Sleep(100);
+                } while (freeze == true);
                 for (int i = 1; i <= num_jobs; i++)
                 {
                     int index = ((i + num_workers) % num_workers);
@@ -714,6 +706,32 @@ namespace Worker
                 return workers_urls;
             }
 
+            public void FreezeC()
+            {
+                if (freeze == true)
+                {
+                    System.Console.WriteLine("JOBTRACKER -- JA ESTA EM MODO FREEZE!");
+
+                }
+                else
+                {
+                    freeze = true;
+                    System.Console.WriteLine("JOBTRACKER -- FREEZE!");
+                }   
+            }
+
+            public void UnFreezeC()
+            {
+                if (freeze == false)
+                {
+                    System.Console.WriteLine("JOBTRACKER -- Ja NAO esta freeze!");
+                }
+                else
+                {
+                    freeze = false;
+                    System.Console.WriteLine("JOBTRACKER -- ACTIVE!!!!");
+                } 
+            }
 
             public void getWorkers(string job_tracker_url)
             {

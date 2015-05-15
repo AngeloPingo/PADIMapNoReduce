@@ -5,3 +5,10 @@ C:\Users\Carlos\Source\Repos\PADIMapNoReduce\Projects\Client\bin\Debug\PADIMapNo
 C:\Users\Carlos\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.csprojResolveAssemblyReference.cache
 C:\Users\Carlos\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.exe
 C:\Users\Carlos\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.pdb
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\bin\Debug\Client.exe
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\bin\Debug\Client.pdb
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\bin\Debug\PADIMapNoReduceServices.dll
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\bin\Debug\PADIMapNoReduceServices.pdb
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.csprojResolveAssemblyReference.cache
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.exe
+C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Client\obj\Debug\Client.pdb
