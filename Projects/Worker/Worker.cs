@@ -25,6 +25,7 @@ namespace Worker
         public static Hashtable job_trackers_url = new Hashtable();
         public static int port;
         public static TcpChannel chan;
+        public static string client_url = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -87,12 +88,23 @@ namespace Worker
                 foreach (DictionaryEntry job_tracker_pair in job_trackers_urls_fetched)
                 {
 
-                    IJobTracker job_tracker =
-                (IJobTracker)Activator.GetObject(
-                       typeof(IJobTracker), (string)job_tracker_pair.Value);
-                    job_tracker.registerNewWorker(my_id, my_url);
-                    Console.WriteLine("Registou o worker com ID: " + my_id + " e url: " + my_url + " EM: " + (string)job_tracker_pair.Value);
-                    job_trackers_url.Add((int)job_tracker_pair.Key, (string)job_tracker_pair.Value);
+                    try
+                    {
+
+                        IJobTracker job_tracker =
+                    (IJobTracker)Activator.GetObject(
+                           typeof(IJobTracker), (string)job_tracker_pair.Value);
+                        job_tracker.registerNewWorker(my_id, my_url);
+                        Console.WriteLine("Registou o worker com ID: " + my_id + " e url: " + my_url + " EM: " + (string)job_tracker_pair.Value);
+                        if (!job_trackers_url.ContainsKey((int)job_tracker_pair.Key))
+                        {
+                            job_trackers_url.Add((int)job_tracker_pair.Key, (string)job_tracker_pair.Value);
+                        }
+                    }
+                    catch (SocketException e)
+                    {
+                        continue;
+                    }
                 }
 
                 Console.WriteLine('\n' + "/////////////////TABELA JTs NO WORKER ACTUALIZADA/////////////");
@@ -210,8 +222,10 @@ namespace Worker
         //Hashtable jobTrackers = new Hashtable();
         Boolean freeze = false;
         Boolean slow = false;
+        int slowTime;
         object ClassMap;
         string jobTrackerMaster;
+        string jobsSucess = "";
 
         public WorkerServices()
         {
@@ -232,6 +246,7 @@ namespace Worker
             //System.Console.WriteLine("code: " + code);
             //System.Console.WriteLine("className: " + className);
             //System.Console.WriteLine("splited_file_path: " + splited_file_path);
+            Worker.client_url = client_url;
 
             string Jobline = null;
             IClient newClient = (IClient)Activator.GetObject(typeof(IClient), client_url);
@@ -274,7 +289,10 @@ namespace Worker
                             IList<KeyValuePair<string, string>> result = null;
                             result = (IList<KeyValuePair<string, string>>)resultObject;
                             newClient.SendSplitResults(result, num_job + "");
-
+                            if (result != null)
+                            {
+                                jobsSucess = +num_job + " ; ";
+                            }
                             // FALTA GUARDAR RESULTADO NOS FICHEIROS COM O NOME OUTPUT
 
                             //Console.WriteLine("Map call result was: ");
@@ -309,6 +327,7 @@ namespace Worker
 
         public void SlowW(int secs)
         {
+            slowTime = secs;
             slow = true;
             System.Console.WriteLine("WORKER -- SLOW DURANTE " + secs + " SEGUNDOS");
             System.Threading.Thread.Sleep(secs * 1000);
@@ -346,7 +365,10 @@ namespace Worker
         {
             //Worker.my_job_tracker_url = url_JobTracker;
             Console.WriteLine("WORKER: Job_tracker_url Registado: " + url_JobTracker);
-            Worker.job_trackers_url.Add(id, url_JobTracker);
+            if (!Worker.job_trackers_url.ContainsKey(id))
+            {
+                Worker.job_trackers_url.Add(id, url_JobTracker);
+            }
 
 
 
@@ -380,6 +402,27 @@ namespace Worker
         public Hashtable getJobTrackerUrls()
         {
             return Worker.job_trackers_url;
+        }
+
+
+        public void status()
+        {
+            Console.WriteLine("/////////////////////  STATUS WORKER //////////////////////////");
+            Console.WriteLine("Worker is Solow: {0} with {1} secs", slow, slowTime);
+            Console.WriteLine("Worker is Freeze: " + freeze);
+            Console.WriteLine("Jobs Done with success: " + jobsSucess);
+            Console.WriteLine("//////////////////////////////////////////////////////////////");
+            if (Worker.client_url != null) {
+                IClient newClient = (IClient)Activator.GetObject(typeof(IClient), Worker.client_url);
+                try
+                {
+                    newClient.status();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception: " + e.ToString());
+                }
+            }
         }
     }
     
@@ -747,21 +790,31 @@ namespace Worker
 
                         if (!workers_urls.ContainsKey(pair.Key))
                         {
-                            workers_urls.Add(pair.Key, pair.Value);
-                            IWorker newWorker =
-                            (IWorker)Activator.GetObject(
-                                   typeof(IWorker), (string)pair.Value);
-                            workers.Add(pair.Key, newWorker);
-                            Console.WriteLine('\n' + "JT: Adicionou Worker: ID: " + pair.Key + " - URL: " + pair.Value);
-                            Console.WriteLine('\n' + "///////////TABELA WORKERS NO JT ACTUALIZADA//////");
-                            foreach (DictionaryEntry par in workers_urls)
+                            try
                             {
-                                Console.WriteLine("//     ID: " + par.Key + " - URL: " + par.Value + "    //");
-                            }
-                            Console.WriteLine("/////////////////////////////////////////////////" + '\n');
+                                
+                                IWorker newWorker =
+                                (IWorker)Activator.GetObject(
+                                       typeof(IWorker), (string)pair.Value);
+                                
+                                
 
-                            newWorker.RegisterJobTracker(port_job_tracker, myURL);
-                            Console.WriteLine("JT: Registado no worker:" + pair.Value);
+                                newWorker.RegisterJobTracker(port_job_tracker, myURL);
+                                workers_urls.Add(pair.Key, pair.Value);
+                                workers.Add(pair.Key, newWorker);
+                                Console.WriteLine('\n' + "JT: Adicionou Worker: ID: " + pair.Key + " - URL: " + pair.Value);
+                                Console.WriteLine('\n' + "///////////TABELA WORKERS NO JT ACTUALIZADA//////");
+                                foreach (DictionaryEntry par in workers_urls)
+                                {
+                                    Console.WriteLine("//     ID: " + par.Key + " - URL: " + par.Value + "    //");
+                                }
+                                Console.WriteLine("/////////////////////////////////////////////////" + '\n');
+                                Console.WriteLine("JT: Registado no worker:" + pair.Value);
+                            }
+                            catch (SocketException e)
+                            {
+                                continue;
+                            }
                         }
                         
                         

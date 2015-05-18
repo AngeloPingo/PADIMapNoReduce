@@ -170,6 +170,7 @@ namespace Client
         Hashtable files_splited = null;
         string output_path;
         static string path_files = Path.Combine(@"D:\Code\PADIMapNoReduce\files\");
+        string JobsSended = "";
 
         public ClientServices(Hashtable files_split, string output)
         {
@@ -216,13 +217,20 @@ namespace Client
             int number_lines = reader_file.Length;
             Hashtable hash_map_words = new Hashtable();
 
-            foreach (string line in reader_file)
-            {
-                string_to_send = string_to_send + " " + line;
-            }
-
+            string_to_send = File.ReadAllText(file);
+            System.Console.WriteLine("Client - Ficheiro enviado: " + file);
             return string_to_send;
         }
+
+        public void status()
+        {
+            Console.WriteLine("/////////////////////  STATUS CLIENT //////////////////////////");
+            Console.WriteLine("File splited in {0} pieces.", files_splited.Count);
+            Console.WriteLine("Output path for results: " + output_path);
+            Console.WriteLine("Jobs sended to workers: " + JobsSended);
+            Console.WriteLine("//////////////////////////////////////////////////////////////");
+        }
+
     }
 
 }

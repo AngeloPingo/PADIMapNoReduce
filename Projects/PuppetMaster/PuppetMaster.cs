@@ -21,6 +21,7 @@ namespace PuppetMaster
     public partial class PuppetMaster : Form
     {
         Hashtable workers = new Hashtable();
+        public static Hashtable workers_connection = new Hashtable();
         int port = 20001;
         string puppet_master_name = "PM";
         string worker_name = "/W";
@@ -119,6 +120,7 @@ namespace PuppetMaster
 
         private void button1_Click(object sender, EventArgs e)
         {
+            workers_connection = new Hashtable();
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.Filter = "Text Files With Script|*.txt";
             openFileDialog1.Title = "Select a File to load a Script";
@@ -180,91 +182,56 @@ namespace PuppetMaster
             char[] delimiterChars = {' '};
             String[] lineSplitted = line.Split(delimiterChars);
             String[] args;
-            //System.Console.WriteLine("SIZE Args: " + lineSplitted.Length);
-            //System.Console.WriteLine("lineSplitted: ");
-            //printArgs(lineSplitted);
+            System.Console.WriteLine("SIZE Args: " + lineSplitted.Length);
+            System.Console.WriteLine("lineSplitted: ");
+            printArgs(lineSplitted);
             switch (lineSplitted[0])
             {
                 case "WORKER":
                     //System.Console.WriteLine("Enter command: WORKER-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 5 || lineSplitted.Length == 6)
-                    {
-                        //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
                         launchWorker(args);
-                    }
                     break;
                 case "SUBMIT":
                     //System.Console.WriteLine("Enter command: SUBMIT-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 7)
-                    {
-                        //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
                         launchClient(args);
-                    }
                     break;
                 case "WAIT":
-                    //System.Console.WriteLine("Enter command: WAIT-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 2)
-                    {
-                        //printArgs(lineSplitted);
+                    System.Console.WriteLine("Enter command: WAIT-" + lineSplitted.Length);
                         args = removeFirst(lineSplitted);
                         launchWait(args);
-                    }
                     break;
                 case "STATUS":
                     //System.Console.WriteLine("Enter command: STATUS-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 1)
-                    {
-                        //printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
-                        //launchStatus();
-                    }
+                        launchStatus();
                     break;
                 case "SLOWW":
-                    //System.Console.WriteLine("Enter command: SLOWW-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 4)
-                    {
+                    System.Console.WriteLine("Enter command: SLOWW-" + lineSplitted.Length);
                         printArgs(lineSplitted);
                         args = removeFirst(lineSplitted);
                         launchSloww(args);
-                    }
                     break;
                 case "FREEZEW":
-                    //System.Console.WriteLine("Enter command: FREEZEW-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 2)
-                    {
-                        //printArgs(lineSplitted);
+                    System.Console.WriteLine("Enter command: FREEZEW-" + lineSplitted.Length);
                         args = removeFirst(lineSplitted);
                         launchFreezew(args);
-                    }
                     break;
                 case "UNFREEZEW":
-                    //System.Console.WriteLine("Enter command: UNFREEZEW-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 2)
-                    {
-                        //printArgs(lineSplitted);
+                    System.Console.WriteLine("Enter command: UNFREEZEW-" + lineSplitted.Length);
                         args = removeFirst(lineSplitted);
                         launchUnfreezew(args);
-                    }
                     break;
                 case "FREEZEC":
-                    //System.Console.WriteLine("Enter command: FREEZEC-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 2)
-                    {
-                        //printArgs(lineSplitted);
+                    System.Console.WriteLine("Enter command: FREEZEC-" + lineSplitted.Length);
                         args = removeFirst(lineSplitted);
                         launchFreezec(args);
-                    }
                     break;
                 case "UNFREEZEC":
-                    //System.Console.WriteLine("Enter command: UNFREEZEC-" + lineSplitted.Length);
-                    if (lineSplitted.Length == 2)
-                    {
-                        //printArgs(lineSplitted);
+                    System.Console.WriteLine("Enter command: UNFREEZEC-" + lineSplitted.Length);
                         args = removeFirst(lineSplitted);
                         launchUnfreezec(args);
-                    }
                     break;
                 default:
                     System.Console.WriteLine("Command doesn't not exist! -> " + lineSplitted[0]);
@@ -280,7 +247,7 @@ namespace PuppetMaster
             String[] lineSplitted = worker_url.Split(delimiterChars);
             string service_job_tracker = "JobTracker";
             string url_tcp = "tcp://localhost:";
-            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[1]);
+            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[4]);
             string job_url = url_tcp + port_job_tracker + "/" + service_job_tracker;
 
             IJobTracker newIJobTracker =
@@ -299,7 +266,7 @@ namespace PuppetMaster
             String[] lineSplitted = worker_url.Split(delimiterChars);
             string service_job_tracker = "JobTracker";
             string url_tcp = "tcp://localhost:";
-            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[1]);
+            int port_job_tracker = 5000 + Convert.ToInt32(lineSplitted[4]);
             string job_url = url_tcp + port_job_tracker + "/" + service_job_tracker;
 
             IJobTracker newIJobTracker =
@@ -314,9 +281,7 @@ namespace PuppetMaster
         {
             int id_Worker = Convert.ToInt32(args[0]);
             string worker_url = (string)workers[id_Worker];
-            IWorker newIWorker =
-                (IWorker)Activator.GetObject(
-                       typeof(IWorker), worker_url);
+            IWorker newIWorker = (IWorker)workers_connection[id_Worker];
 
             RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIWorker.UnFreezeW);
             IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
@@ -326,9 +291,7 @@ namespace PuppetMaster
         {
             int id_Worker = Convert.ToInt32(args[0]);
             string worker_url = (string)workers[id_Worker];
-            IWorker newIWorker =
-                (IWorker)Activator.GetObject(
-                       typeof(IWorker), worker_url);
+            IWorker newIWorker = (IWorker)workers_connection[id_Worker];
 
             RemoteAsyncDelegate RemoteDel = new RemoteAsyncDelegate(newIWorker.FreezeW);
             IAsyncResult RemAr = RemoteDel.BeginInvoke(null, null);
@@ -341,9 +304,7 @@ namespace PuppetMaster
             System.Console.WriteLine("OLA"+worker_url);
             int delay = Convert.ToInt32(args[1]);
 
-            IWorker newIWorker =
-                (IWorker)Activator.GetObject(
-                       typeof(IWorker), worker_url);
+            IWorker newIWorker = (IWorker)workers_connection[id_Worker];
 
             RemoteAsyncDelegate2 RemoteDel = new RemoteAsyncDelegate2(newIWorker.SlowW);
             IAsyncResult RemAr = RemoteDel.BeginInvoke(delay, null, null);
@@ -351,7 +312,17 @@ namespace PuppetMaster
 
         private void launchStatus()
         {
-            throw new NotImplementedException();
+            foreach (IWorker worker in workers_connection.Values)
+            {
+                try
+                {
+                    worker.status();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception: " + e.ToString());
+                }
+            }
         }
 
         private void launchWait(string[] args)
@@ -369,6 +340,7 @@ namespace PuppetMaster
             string num_splits = args[3];
             string map = args[4];
             string dll = args[5];
+
             String[] parametros = new String[] {entery_url, file, output, num_splits, map, dll};
             try
             {
@@ -394,6 +366,19 @@ namespace PuppetMaster
             String[] parametros = new String[] { id, puppet_url, service_url, entry_url };
             workers[Convert.ToInt32(id)] = service_url;
             System.Console.WriteLine("Estamos aqui" + id + "service" + workers[Convert.ToInt32(id)]);
+
+            IWorker newWorker = null;
+            newWorker =
+                (IWorker)Activator.GetObject(
+                       typeof(IWorker), service_url);
+
+            if (newWorker != null)
+            {
+                if (!workers_connection.ContainsKey(service_url))
+                {
+                    workers_connection.Add(Convert.ToInt32(id), newWorker);
+                }
+            }
 
             try
             {
@@ -517,11 +502,11 @@ namespace PuppetMaster
         }
         public string SubmitJob(string result)
         {
-            return "Ola ocnosucnso" + result;
+            return "NotImplementedException" + result;
         }
         public string JobResult(string result)
         {
-            return "Ola ccxcxzcxc" + result;
+            return "NotImplementedException" + result;
         }
 
     }
