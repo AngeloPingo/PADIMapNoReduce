@@ -7,3 +7,8 @@ C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\
 C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\Debug\PADIMapNoReduceServices.pdb
 C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.dll
 C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.pdb
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\bin\Debug\PADIMapNoReduceServices.pdb
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.csprojResolveAssemblyReference.cache
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\PADIMapNoReduceServices\obj\Debug\PADIMapNoReduceServices.pdb

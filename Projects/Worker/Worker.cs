@@ -662,6 +662,7 @@ namespace Worker
                                     else
                                     {
                                         limitTimeLocal = (limitTimeLocal + limitTimeGlobal) / 2;
+                                        limitTimeGlobal = limitTimeLocal;
                                     }
                                     //Console.WriteLine("limitTimeLocal: {0} ; limitTimeGlobal: {1} ", limitTimeLocal, limitTimeGlobal);
                                 }
