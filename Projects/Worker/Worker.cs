@@ -659,6 +659,9 @@ namespace Worker
                                     {
                                         limitTimeGlobal = limitTimeLocal;
                                     }
+                                    else if (limitTimeGlobal > (limitTimeGlobal*2)) {
+                                        limitTimeLocal = limitTimeGlobal * 2;
+                                    }
                                     else
                                     {
                                         limitTimeLocal = (limitTimeLocal + limitTimeGlobal) / 2;

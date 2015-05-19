@@ -13,3 +13,9 @@ C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.cspr
 C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.exe
 C:\Users\joao\Source\Repos\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.pdb
 D:\Code\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.csprojResolveAssemblyReference.cache
+D:\Code\PADIMapNoReduce\Projects\Worker\bin\Debug\Worker.exe
+D:\Code\PADIMapNoReduce\Projects\Worker\bin\Debug\Worker.pdb
+D:\Code\PADIMapNoReduce\Projects\Worker\bin\Debug\PADIMapNoReduceServices.dll
+D:\Code\PADIMapNoReduce\Projects\Worker\bin\Debug\PADIMapNoReduceServices.pdb
+D:\Code\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.exe
+D:\Code\PADIMapNoReduce\Projects\Worker\obj\Debug\Worker.pdb

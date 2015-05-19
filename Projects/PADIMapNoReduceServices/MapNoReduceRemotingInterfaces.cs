@@ -30,6 +30,7 @@ namespace PADIMapNoReduceServices
     {
         void SendSplitResults(IList<KeyValuePair<string, string>> result, string file_name);
         string GetJobById(int job_id);
+        void status();
     }
 
     public interface IWorker : IMapperTransfer
@@ -40,6 +41,7 @@ namespace PADIMapNoReduceServices
         void RegisterJobTracker(int id, string url_JobTracker);
         string getJobTrackerUrl();
         Hashtable getJobTrackerUrls();
+        void status();
     }
     public interface IJobTracker
     {
