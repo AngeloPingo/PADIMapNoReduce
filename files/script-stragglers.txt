@@ -1,0 +1,16 @@
+%WORKER 1 tcp://localhost:20001/PM tcp://localhost:30001/W tcp://localhost:30001/W
+%WORKER 2 tcp://localhost:20001/PM tcp://localhost:30002/W tcp://localhost:30001/W
+%WORKER 3 tcp://localhost:20001/PM tcp://localhost:30003/W tcp://localhost:30001/W
+WORKER 4 tcp://localhost:20001/PM tcp://localhost:30004/W tcp://localhost:30001/W
+WORKER 5 tcp://localhost:20001/PM tcp://localhost:30005/W tcp://localhost:30001/W
+STATUS
+%check clock for start time
+SUBMIT tcp://localhost:30003/W time30.txt result 4 TimeMapper ./LibMapperTime.dll
+%check clock for end time
+STATUS
+%check clock for start time
+SUBMIT tcp://localhost:30003/W time30.txt result 4 TimeMapper ./LibMapperTime.dll
+SLOWW 2 25
+%check clock for end time
+
+
